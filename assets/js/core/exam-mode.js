@@ -15,6 +15,7 @@
   const mapButton=$('#mapButton');
   const originalLessonBack=lessonBack&&lessonBack.onclick;
   const originalMapButton=mapButton&&mapButton.onclick;
+  const savedExamPoints=()=>Number(record.lastScore)||0;
 
   const isUsableQuestion=item=>Array.isArray(item)&&typeof item[0]==='string'&&Array.isArray(item[1])&&item[1].length===3&&Number.isInteger(item[2])&&item[2]>=0&&item[2]<3&&!badQuestionPatterns.some(pattern=>pattern.test(item[0]));
   const normalize=(item,unit,index)=>({question:item[0],options:item[1],answer:item[2],explain:item[3]||'请结合题目条件检查计算和单位。',reasoning:item[4],unit:unit.title,unitIndex:index});
@@ -90,7 +91,8 @@
   }
   function updateExamTop(){
     const score=$('#starCount'),label=$('#unitProgressLabel'),text=$('#unitProgressText'),bar=$('#unitProgressBar');
-    if(score){score.textContent=examState.points;score.setAttribute('aria-label',`整册考试实时得分 ${examState.points} 分`)}
+    const displayScore=examState.started?examState.points:savedExamPoints();
+    if(score){score.textContent=displayScore;score.setAttribute('aria-label',`${examState.started?'整册考试实时得分':'上次整册考试得分'} ${displayScore} 分`)}
     if(label)label.textContent='整册考试';
     if(text)text.textContent=`${Math.min(examState.index,questionCount)}/${questionCount}`;
     if(bar)bar.style.width=`${Math.round(Math.min(examState.index,questionCount)/questionCount*100)}%`;
@@ -135,7 +137,7 @@
       <div class="quiz-head"><div><span class="panel-label">整册考试</span><h2>第${examState.index+1}题 / 共${questionCount}题</h2><p>每题2分，首次答错扣2分；右上角显示本次考试实时得分。</p></div><div class="exam-source">${escapeHtml(item.unit)}</div></div>
       <div class="quiz-progress">${Array.from({length:questionCount},(_,i)=>`<i class="${i<examState.index?'done':''}"></i>`).join('')}</div>
       <div class="quiz-question"><h3>${escapeHtml(item.question)}</h3><div class="option-grid">${item.options.map((option,i)=>`<button class="option-button" data-exam-answer="${i}">${escapeHtml(option)}</button>`).join('')}</div>
-      <div class="feedback" id="examFeedback">${examState.started?`当前得分 ${examState.points} 分，请选择答案。`:'考试开始，当前得分100分。请独立读完题目后作答。'}</div></div>
+      <div class="feedback" id="examFeedback">${examState.started?`当前得分 ${examState.points} 分，请选择答案。`:`右上角是上次整册考试得分 ${savedExamPoints()} 分；回答本题后，本次从 100 分开始计分。`}</div></div>
     </article>`;
     updateExamTop();
     $$('[data-exam-answer]').forEach(button=>button.onclick=()=>answerExam(Number(button.dataset.examAnswer),button));
