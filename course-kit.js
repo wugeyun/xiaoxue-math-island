@@ -16,21 +16,25 @@
     const choice=rotate(correct,wrong1,wrong2,seed);
     return [question,choice.options,choice.answer,explain];
   };
-  const wrongRule='只看数字大小，不看题目关系';
+  const cleanSentence=value=>String(value??'').trim().replace(/[。！？!?；;：:，,、]+$/,'');
+  const makeContextChecks=({label,title,text,equation,result,rule})=>{
+    const context=`在“${cleanSentence(label)}”情境中，${cleanSentence(title)}。${cleanSentence(text)}`;
+    return [
+    [`${context}。解决这个具体问题时，适用的规则是什么？`,rule,'只看数字大小，不读题意','把所有数字直接相加',`先读懂“${cleanSentence(title)}”和“${cleanSentence(text)}”，再依据数量或图形关系选择${rule}。`],
+    [`${context}。正确的关键算式或表示是？`,equation,'只抄题目标题，不列式','不使用题目给出的条件',`题目中的条件可以表示为：${equation}。`],
+    [`${context}。按${equation}计算或判断后，正确结论是什么？`,result,'只写一个数字，不说明意义','得到与题目条件无关的结果',`根据题目条件和${equation}，可以得到：${result}。`],
+    [`${context}。哪种做法能避免把答案算错？`,'先读条件、找关系，再列式或作图检查','看到数字就直接套用同一个公式','只看选项长短来猜答案',`先弄清题目给出的条件，再完成${equation}并检查${result}。`],
+    [`${context}。完成计算后怎样检查答案是否合理？`,`把${result}带回题目，检查数量、单位和实际意义`,'不需要检查，算出数字就结束','只检查数字写得是否足够大',`把${result}带回“${cleanSentence(title)}”和“${cleanSentence(text)}”对应的情境中检查。`]
+    ];
+  };
   window.mathUnit=function(u){
     const [label,title,text,equation,result]=u.example;
     const life=u.life||[
       ['🔎','第一步：找出关系',`${label}里遇到一个问题：${title}。${text}`,`把已知条件和问题连起来，应该怎样列式或表示？`,equation,'把所有数字直接相加','只写一个单位，不列关系',`先读懂“${title}。${text}”，再根据数量或图形关系写出：${equation}。`,[`已知情境：${title}。${text}`,`要求：解决“${title}”`, `列式或表示：${equation}`]],
-      ['🧮','第二步：算一算',`我们已经得到关键表达：${equation}`,`沿着这个表达继续计算或判断，正确结论是什么？`,result,'停在列式处，不继续完成','换一个与题意无关的结果',`沿着${equation}计算或判断，可以得到：${result}`,['先写出关键关系',`再完成：${equation}`,`得到：${result}`]],
+      ['🧮','第二步：算一算',`${label}中已知${text}，题目要求“${title}”。`,`根据这些条件，哪一项是正确的结果或结论？`,result,'只抄下算式，不完成计算','选择一个与条件无关的结果',`根据${equation}计算或判断，可以得到：${result}`,['找出题目给出的条件',`根据关系处理：${equation}`,`写出完整结论：${result}`]],
       ['✅','第三步：回到生活中检查',`${label}的问题是“${title}”，已知${text}`,`把结果带回原问题，哪一句回答完整而合理？`,result,'只写数字，不回答原问题','忽略单位和实际意义',`回到情境检查：${equation}，所以${result}`,['检查条件有没有用全',`核对过程：${equation}`,`完整回答：${result}`]]
     ];
-    const checks=u.checks||[
-      [`“${u.title}”的关键规则是？`,u.rule,'只凭感觉猜','所有数字都相加',u.rule],
-      [`“${title}”可以怎样表示？`,equation,'不能表示','只写题目标题',`关键表达是${equation}。`],
-      ['这道例题的结论是？',result,'没有答案','答案与条件无关',`结论是：${result}`],
-      ['解决新问题时，第一步应该？','读懂条件和问题','马上写答案','忽略单位','先读懂题意。'],
-      ['完成后怎样检查？','把结果带回情境并检查单位','不需要检查','只看字写得大不大','回到情境检查最可靠。']
-    ];
+    const checks=Array.isArray(u.checks)&&u.checks.length?u.checks:makeContextChecks({label,title,text,equation,result,rule:u.rule});
     return {
       ...u,
       life,checks,
@@ -44,12 +48,29 @@
       const lives=u.life.map((x,i)=>makeLife(x,index+i));
       const core=u.checks.map((x,i)=>makeQuiz(x,index+i));
       const act=u.activity;
+      const makeLifeQuiz=(life,seed)=>makeQuiz([
+        `${life.story} ${life.question}`,
+        life.options[life.answer],
+        life.options[(life.answer+1)%3],
+        life.options[(life.answer+2)%3],
+        life.explain
+      ],seed);
+      const makeReasoningQuiz=(life,seed)=>{
+        const complete=(life.thinking&&life.thinking[2])||life.explain;
+        return makeQuiz([
+          `${life.story} ${life.question} 要写出完整答案，下面哪种作答最合适？`,
+          complete,
+          '只写最后的数字，不说明单位或结论',
+          '把题目中的所有数字直接相加',
+          `先根据条件找关系，再列式或作图并检查：${life.explain}`
+        ],seed);
+      };
       const review=[
-        makeQuiz([`学习“${u.title}”时，首先要做什么？`,'读懂题意并找出数量或图形关系','马上猜答案','只抄算式不思考','先弄清对象和关系，方法才不会选错。'],index+5),
-        makeQuiz([`下面哪句话符合“${u.title}”的学习规则？`,u.rule,wrongRule,'所有题都用同一个公式',u.rule],index+6),
-        makeQuiz([`例子“${u.story.title}”中的关键表达是？`,u.story.equation,'与题意无关','不能列式',`关键关系可以写成：${u.story.equation}`],index+7),
-        makeQuiz([act.text,act.options[act.answer],act.options[(act.answer+1)%3],act.options[(act.answer+2)%3],act.success],index+8),
-        makeQuiz([lives[0].question,lives[0].options[lives[0].answer],lives[0].options[(lives[0].answer+1)%3],lives[0].options[(lives[0].answer+2)%3],lives[0].explain],index+9)
+        makeLifeQuiz(lives[0],index+5),
+        makeLifeQuiz(lives[1],index+6),
+        makeLifeQuiz(lives[2],index+7),
+        makeReasoningQuiz(lives[0],index+8),
+        makeReasoningQuiz(lives[1],index+9)
       ];
       return {
         id:u.id,number:u.number,title:u.title,icon:u.icon,subtitle:u.subtitle,color:u.color||colors[index%colors.length],
