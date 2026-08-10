@@ -17,10 +17,16 @@
   const originalMapButton=mapButton&&mapButton.onclick;
 
   const isUsableQuestion=item=>Array.isArray(item)&&typeof item[0]==='string'&&Array.isArray(item[1])&&item[1].length===3&&Number.isInteger(item[2])&&item[2]>=0&&item[2]<3&&!badQuestionPatterns.some(pattern=>pattern.test(item[0]));
-  const normalize=(item,unit,index)=>({question:item[0],options:item[1],answer:item[2],explain:item[3]||'请结合题目条件检查计算和单位。',unit:unit.title,unitIndex:index});
-  const reasoningHtml=(item,scoreText)=>{
+  const normalize=(item,unit,index)=>({question:item[0],options:item[1],answer:item[2],explain:item[3]||'请结合题目条件检查计算和单位。',reasoning:item[4],unit:unit.title,unitIndex:index});
+  const reasoningHtml=(item,scoreText,icon)=>{
     const explanation=String(item.explain||'请结合题目条件检查计算和单位。').trim().replace(/[。！？!?；;：:，,、]+$/,'');
-    return `<b>❌ ${escapeHtml(scoreText)}</b><b>🪜 完整解题思路：</b><ol><li>审题：先找出题目给出的数量、单位、位置或图形条件，明确题目要求计算、比较还是判断什么。</li><li>找关系：${escapeHtml(explanation)}</li><li>完成：按照上面的数量关系、运算顺序或图形关系逐步计算或判断，不要只凭选项猜答案。</li><li>检查：把得到的结果带回原题，核对数值、单位和实际意义，确认它确实回答了题目。</li></ol><p>再按这条思路读一遍题目，换一个选项试试。</p>`;
+    const steps=Array.isArray(item.reasoning)&&item.reasoning.length?item.reasoning:[
+      '审题：先找出题目给出的数量、单位、位置或图形条件，明确题目要求计算、比较还是判断什么。',
+      `找关系：${explanation}`,
+      '完成：按照上面的数量关系、运算顺序或图形关系逐步计算或判断，不要只凭选项猜答案。',
+      '检查：把得到的结果带回原题，核对数值、单位和实际意义，确认它确实回答了题目。'
+    ];
+    return `<b>${icon} ${escapeHtml(scoreText)}</b><b>🪜 完整解题思路：</b><ol>${steps.map(step=>`<li>${escapeHtml(step)}</li>`).join('')}</ol><p>再按这条思路读一遍题目，确认理解后继续。</p>`;
   };
   function buildExamQuestions(){
     const pools=courseUnits.map((unit,unitIndex)=>({unit,unitIndex,items:(unit.quiz||[]).filter(isUsableQuestion).map(item=>normalize(item,unit,unitIndex)),cursor:0}));
@@ -77,6 +83,13 @@
   function showExamLesson(){
     const steps=$('.learning-steps');
     if(steps)steps.style.display='none';
+    const chips=$$('.lesson-chips span');
+    if(chips.length>=4){
+      chips[0].textContent='⏱ 约 30 分钟';
+      chips[1].textContent='📚 覆盖本册内容';
+      chips[2].textContent='⭐ 50 题考试';
+      chips[3].textContent='🎯 每题 2 分';
+    }
     document.documentElement.style.setProperty('--unit-color',examColor);
     $('#mapView').classList.remove('active');
     $('#lessonView').classList.add('active');
@@ -117,16 +130,16 @@
     if(choice===item.answer){
       $$('.exam-stage [data-exam-answer]').forEach(option=>option.disabled=true);
       button.classList.add('correct');
-      feedback.className='feedback success';
-      feedback.textContent=`回答正确，当前得分 ${examState.points} 分。`;
+      feedback.className='feedback success reasoning-feedback';
+      feedback.innerHTML=reasoningHtml(item,`回答正确，当前得分 ${examState.points} 分。`,'✅')+'<button class="primary-button next-question-button" id="examNext">下一题 →</button>';
+      $('#examNext').onclick=()=>{examState.index++;renderExamQuestion()};
       updateExamTop();
-      setTimeout(()=>{examState.index++;renderExamQuestion()},650);
       return;
     }
     if(!examState.penalized){examState.points=Math.max(0,examState.points-2);examState.mistakes++;examState.penalized=true}
     button.disabled=true;button.classList.add('wrong');
     feedback.className='feedback error reasoning-feedback';
-    feedback.innerHTML=reasoningHtml(item,`这道题扣2分，当前得分 ${examState.points} 分。`);
+    feedback.innerHTML=reasoningHtml(item,`这道题扣2分，当前得分 ${examState.points} 分。`,'❌');
     updateExamTop();
   }
   function renderExamResult(){
@@ -159,7 +172,7 @@
     updateMapCopy();
   }
   const examStyle=document.createElement('style');
-  examStyle.textContent='.exam-card,.exam-nav-item{--unit-color:#d45f78}.exam-card .unit-no,.exam-source{color:var(--unit-color)}.exam-stage .quiz-head{align-items:flex-start}.exam-source{background:#fff0f3;border-radius:999px;padding:8px 12px;font-size:12px;white-space:nowrap}.exam-result strong{color:var(--unit-color);font-size:26px}.exam-card.complete{border-color:var(--unit-color)}';
+  examStyle.textContent='.exam-card,.exam-nav-item{--unit-color:#d45f78}.exam-card .unit-no,.exam-source{color:var(--unit-color)}.exam-stage .quiz-head{align-items:flex-start}.exam-source{background:#fff0f3;border-radius:999px;padding:8px 12px;font-size:12px;white-space:nowrap}.exam-result strong{color:var(--unit-color);font-size:26px}.exam-card.complete{border-color:var(--unit-color)}.reasoning-feedback .next-question-button{margin-top:10px}';
   document.head.appendChild(examStyle);
   installObservers();
 })();

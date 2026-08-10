@@ -62,7 +62,20 @@ function renderStory(){const u=unit(),s=u.story;$('#lessonStage').innerHTML=`<ar
 
 function activityHeader(a){return `<div class="stage-head"><div><span class="panel-label">轮到你动手</span><h2>${a.title}</h2><p>${a.text}</p></div><div class="stage-badge">👆 亲手发现</div></div>`}
 function activityFooter(){return `<div class="feedback" id="activityFeedback">先试一试，做错也没关系。</div><div class="panel-actions"><button class="ghost-button" id="activityReset">重新来</button><button class="primary-button" id="stageNext" disabled>完成啦，去分步解题 →</button></div>`}
-function finishActivity(msg){const f=$('#activityFeedback');f.className='feedback success';f.textContent='🎉 '+msg;$('#stageNext').disabled=false;completeStep(1);bindNext(2)}
+function activityReasoning(a,extra=''){
+  const steps=Array.isArray(a.reasoning)&&a.reasoning.length?a.reasoning:[
+    `读题：${a.text||'先读清题目给出的条件和要求。'}`,
+    `找关系：${extra||a.success||'把题目中的数量、位置或图形关系对应起来。'}`,
+    '检查：完成后把结果带回题目，核对数量、单位、方向或图形关系是否符合要求。'
+  ];
+  return steps;
+}
+function showActivityFeedback(kind,title,a,extra=''){
+  const f=$('#activityFeedback');if(!f)return;
+  f.className=`feedback ${kind} reasoning-feedback`;
+  f.innerHTML=`<b>${title}</b><b>🪜 完整解题思路：</b><ol>${activityReasoning(a,extra).map(x=>`<li>${escapeFeedbackText(x)}</li>`).join('')}</ol>`;
+}
+function finishActivity(msg,a=unit().activity){showActivityFeedback('success','🎉 完成了！',a,msg);$('#stageNext').disabled=false;completeStep(1);bindNext(2)}
 function renderActivity(){
   const a=unit().activity;state.activity={count:0,value:a.start||0,sum:0};
   let body='';
@@ -75,16 +88,27 @@ function renderActivity(){
 function bindActivity(a){
   $('#activityReset').onclick=renderActivity;
   if(a.type==='group')$('#sourceButton').onclick=()=>{if(state.activity.count>=a.total)return;const index=state.activity.count%a.groups,bucket=$(`[data-bucket="${index}"]`),token=document.createElement('span');token.className='pop-token';token.textContent=a.token;bucket.appendChild(token);state.activity.count++;$('#remainCount').textContent=a.total-state.activity.count;if(state.activity.count===a.total)finishActivity(a.success)};
-  if(['choice','pattern','calendar'].includes(a.type))$$('[data-activity-answer]').forEach(b=>b.onclick=()=>{const n=Number(b.dataset.activityAnswer);if(n===a.answer){b.classList.add('correct');$$('[data-activity-answer]').forEach(x=>x.disabled=true);finishActivity(a.success)}else{b.classList.add('wrong');$('#activityFeedback').className='feedback error';$('#activityFeedback').textContent='再观察一下，换一个答案试试。';setTimeout(()=>b.classList.remove('wrong'),600)}});
-  if(a.type==='builder')$$('[data-change]').forEach(b=>b.onclick=()=>{state.activity.value+=Number(b.dataset.change);$('#builderNumber').textContent=state.activity.value;if(state.activity.value===a.target)finishActivity(a.success);else if(Math.abs(state.activity.value-a.target)>200){$('#activityFeedback').textContent='离目标有点远啦，可以重新开始。'}});
-  if(a.type==='coins')$$('[data-coin]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.coin);state.activity.sum=Math.round((state.activity.sum+v)*10)/10;$('#coinTotal').textContent=state.activity.sum.toFixed(1);$('#coinPurse').textContent+='🪙';if(state.activity.sum===a.target)finishActivity(a.success);if(state.activity.sum>a.target){$('#activityFeedback').className='feedback error';$('#activityFeedback').textContent='钱放多了，重新凑一次吧。';$$('[data-coin]').forEach(x=>x.disabled=true)}});
+  if(['choice','pattern','calendar'].includes(a.type))$$('[data-activity-answer]').forEach(b=>b.onclick=()=>{const n=Number(b.dataset.activityAnswer);if(n===a.answer){b.classList.add('correct');$$('[data-activity-answer]').forEach(x=>x.disabled=true);finishActivity(a.success,a)}else{b.classList.add('wrong');showActivityFeedback('error','❌ 这次还没选对。',a,'先把题目给出的条件和每个选项逐一对应，再判断哪项满足全部条件。');setTimeout(()=>b.classList.remove('wrong'),600)}});
+  if(a.type==='builder')$$('[data-change]').forEach(b=>b.onclick=()=>{state.activity.value+=Number(b.dataset.change);$('#builderNumber').textContent=state.activity.value;if(state.activity.value===a.target)finishActivity(a.success,a);else showActivityFeedback('error',state.activity.value>a.target?'❌ 已经超过目标。':'🧭 还没有到目标。',a,`目标是${a.target}，当前是${state.activity.value}；先算出还差多少，再选择合适的增减量。`)});
+  if(a.type==='coins')$$('[data-coin]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.coin);state.activity.sum=Math.round((state.activity.sum+v)*10)/10;$('#coinTotal').textContent=state.activity.sum.toFixed(1);$('#coinPurse').textContent+='🪙';if(state.activity.sum===a.target)finishActivity(a.success,a);if(state.activity.sum>a.target){showActivityFeedback('error','❌ 金额超过目标。',a,`目标是${a.target.toFixed(1)}元，当前是${state.activity.sum.toFixed(1)}元；先用减法算出多出的金额，再点击“重新来”重新组合。`);$$('[data-coin]').forEach(x=>x.disabled=true)}});
 }
 
 function renderSolver(){const s=unit().solver;state.solverOpen=0;$('#lessonStage').innerHTML=`<article class="stage-panel"><div class="stage-head"><div><span class="panel-label">像搭积木一样解题</span><h2>一步一步，不着急</h2><p>点击每一步，看看思路怎样连起来。</p></div><div class="equation-card">${s.equation}</div></div><div class="solver-layout"><div class="solver-list">${s.steps.map((x,i)=>`<button class="solver-step ${i===0?'active':'locked'}" data-solver="${i}"><i>${i+1}</i><div><small>${x[0]}</small><b>${x[1]}</b></div><span>${i===s.steps.length-1?'✓':'→'}</span></button>`).join('')}</div><div class="solver-board" id="solverBoard"></div></div><div class="panel-actions"><span id="solverHint">点击第 2 步继续</span><button class="primary-button" id="stageNext" disabled>会分步了，练一练 →</button></div></article>`;showSolver(0);$$('[data-solver]').forEach(b=>b.onclick=()=>{const n=Number(b.dataset.solver);if(n<=state.solverOpen+1)showSolver(n)})}
 function showSolver(n){const s=unit().solver;if(n>state.solverOpen+1)return;state.solverOpen=Math.max(state.solverOpen,n);$$('[data-solver]').forEach((b,i)=>{b.classList.toggle('active',i===n);if(i<=state.solverOpen)b.classList.remove('locked')});const x=s.steps[n];$('#solverBoard').innerHTML=`<div class="chalk-title">第 ${n+1} 步 · ${x[0]}</div><div class="chalk-equation">${x[1]}</div><p>${x[2]}</p><div class="coach"><span>🦊</span><b>${n===s.steps.length-1?'把答案带回题目检查一次。':'想清这一层，再走下一步。'}</b></div>`;if(n===s.steps.length-1){$('#solverHint').textContent='✅ 思路已经连起来了';$('#stageNext').disabled=false;completeStep(2);bindNext(3)}else $('#solverHint').textContent='点击第 '+(n+2)+' 步继续'}
 
 function escapeFeedbackText(value){return String(value??'').replace(/[&<>'"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]))}
-function quizReasoningHtml(item,scoreText){const detail=String(item[3]||'请结合题目条件检查计算和单位。').trim().replace(/[。！？!?；;：:，,、]+$/,'');return `<b>❌ ${escapeFeedbackText(scoreText)}</b><b>🪜 完整解题思路：</b><ol><li>审题：先找出题目给出的数量、单位、位置或图形条件，明确题目要求计算、比较还是判断什么。</li><li>找关系：${escapeFeedbackText(detail)}</li><li>完成：按照上面的数量关系、运算顺序或图形关系逐步计算或判断，不要只凭选项猜答案。</li><li>检查：把得到的结果带回原题，核对数值、单位和实际意义，确认它确实回答了题目。</li></ol><p>再按这条思路读一遍题目，换一个选项试试。</p>`}
+function quizReasoningHtml(item,scoreText,kind='error'){
+  const detail=String(item[3]||'请结合题目条件检查计算、单位和实际意义。').trim().replace(/[。！？!?；;：:，,、]+$/,'');
+  const steps=Array.isArray(item[4])&&item[4].length?item[4]:[
+    '审题：找出题目给出的数量、单位、位置或图形条件，明确题目要求计算、比较还是判断什么。',
+    `找关系：${detail}`,
+    '完成：按照数量关系、运算顺序或图形关系逐步计算或判断，不要只凭选项猜答案。',
+    '检查：把结果带回原题，核对数值、单位和实际意义，确认它确实回答了题目。'
+  ];
+  const icon=kind==='success'?'✅':'❌';
+  const tail=kind==='success'?'把这条思路记下来，下一题也按同样的步骤审题、计算和检查。':'按这条思路重新读题，检查条件、关系和结果后再试一个选项。';
+  return `<b>${icon} ${escapeFeedbackText(scoreText)}</b><b>🪜 完整解题思路：</b><ol>${steps.map(x=>`<li>${escapeFeedbackText(x)}</li>`).join('')}</ol><p>${tail}</p>`;
+}
 function renderLife(){state.lifeIndex=0;renderLifeExample()}
 function renderLifeExample(){
   const examples=unit().lifeExamples||[unit().life],l=examples[state.lifeIndex],isLast=state.lifeIndex===examples.length-1;
@@ -93,7 +117,7 @@ function renderLifeExample(){
   $$('[data-life-answer]').forEach(b=>b.onclick=()=>{
     const n=Number(b.dataset.lifeAnswer),feedback=$('#lifeFeedback');
     if(n===l.answer){
-      b.classList.add('correct');$$('[data-life-answer]').forEach(x=>x.disabled=true);feedback.className='feedback success reasoning-feedback';feedback.innerHTML=`<b>✅ 答对了！完整思路：</b><ol>${thinking.map(x=>`<li>${x}</li>`).join('')}</ol>`;
+       b.classList.add('correct');$$('[data-life-answer]').forEach(x=>x.disabled=true);feedback.className='feedback success reasoning-feedback';feedback.innerHTML=`<b>✅ 答对了！完整思路：</b><ol>${thinking.map(x=>`<li>${escapeFeedbackText(x)}</li>`).join('')}</ol>`;
       const next=$('#stageNext');next.disabled=false;if(isLast){completeStep(3);next.onclick=()=>setStep(4)}else next.onclick=()=>{state.lifeIndex++;renderLifeExample()};
     }else{
       b.classList.add('wrong');feedback.className='feedback error reasoning-feedback';feedback.innerHTML=`<b>❌ 还没选对，先不要只看选项。</b><b>🪜 完整解题思路：</b><ol>${thinking.map(x=>`<li>${escapeFeedbackText(x)}</li>`).join('')}</ol><p>按上面的步骤重新检查条件、关系和结果，再试一次。</p>`;setTimeout(()=>b.classList.remove('wrong'),600);
@@ -102,10 +126,10 @@ function renderLifeExample(){
 }
 
 function renderQuiz(){state.quizIndex=0;state.quizPoints=100;state.quizMistakes=0;state.quizStarted=false;renderQuizQuestion()}
-function renderQuizQuestion(){const q=unit().quiz;if(state.quizIndex>=q.length){renderQuizResult();return}const item=q[state.quizIndex],waiting=!state.quizStarted&&state.quizIndex===0;$('#lessonStage').innerHTML=`<article class="stage-panel"><div class="quiz-head"><div><span class="panel-label">单元闯关赛</span><h2>${unit().title} · ${q.length}题挑战</h2><p>满分100分，每选错一次扣1分；根据提示再试一次。</p></div></div><div class="quiz-progress">${q.map((_,i)=>`<i class="${i<state.quizIndex?'done':''}"></i>`).join('')}</div><div class="quiz-question"><span class="quiz-number">第 ${state.quizIndex+1} 题 / 共 ${q.length} 题</span><h3>${item[0]}</h3><div class="option-grid">${item[1].map((o,i)=>`<button class="option-button" data-quiz-answer="${i}">${o}</button>`).join('')}</div><div class="feedback" id="quizFeedback">${waiting?`右上角是上次得分 ${savedQuizPoints()} 分；回答本题后，本次从 100 分开始计分。`:`选一个答案吧，当前 ${state.quizPoints} 分。`}</div></div></article>`;updateGlobalProgress();$$('[data-quiz-answer]').forEach(b=>b.onclick=()=>answerQuiz(Number(b.dataset.quizAnswer),b))}
-function answerQuiz(n,b){const item=unit().quiz[state.quizIndex],feedback=$('#quizFeedback');if(!state.quizStarted){state.quizStarted=true;state.quizPoints=100}if(n===item[2]){updateGlobalProgress();b.classList.add('correct');$$('[data-quiz-answer]').forEach(x=>x.disabled=true);feedback.className='feedback success';feedback.textContent=`✅ 回答正确，当前 ${state.quizPoints} 分。${item[3]}`;setTimeout(()=>{state.quizIndex++;renderQuizQuestion()},900)}else{state.quizPoints=Math.max(0,state.quizPoints-1);state.quizMistakes++;b.classList.add('wrong');b.disabled=true;updateGlobalProgress();feedback.className='feedback error reasoning-feedback';feedback.innerHTML=quizReasoningHtml(item,`选错一次，扣 1 分；当前 ${state.quizPoints} 分。`)}}
+function renderQuizQuestion(){const q=unit().quiz;if(state.quizIndex>=q.length){renderQuizResult();return}const item=q[state.quizIndex],waiting=!state.quizStarted&&state.quizIndex===0;$('#lessonStage').innerHTML=`<article class="stage-panel"><div class="quiz-head"><div><span class="panel-label">单元闯关赛</span><h2>${unit().title} · ${q.length}题挑战</h2><p>满分100分，每选错一次扣1分；答题后先看解析，再点击“下一题”。</p></div></div><div class="quiz-progress">${q.map((_,i)=>`<i class="${i<state.quizIndex?'done':''}"></i>`).join('')}</div><div class="quiz-question"><span class="quiz-number">第 ${state.quizIndex+1} 题 / 共 ${q.length} 题</span><h3>${item[0]}</h3><div class="option-grid">${item[1].map((o,i)=>`<button class="option-button" data-quiz-answer="${i}">${o}</button>`).join('')}</div><div class="feedback" id="quizFeedback">${waiting?`右上角是上次得分 ${savedQuizPoints()} 分；回答本题后，本次从 100 分开始计分。`:`选一个答案吧，当前 ${state.quizPoints} 分。`}</div><div class="panel-actions quiz-actions"><span>答对后查看完整思路，再手动进入下一题。</span><button class="primary-button" id="quizNext" disabled>下一题 →</button></div></div></article>`;updateGlobalProgress();$$('[data-quiz-answer]').forEach(b=>b.onclick=()=>answerQuiz(Number(b.dataset.quizAnswer),b))}
 function renderQuizResult(){const p=state.progress[unit().id];p.quiz=state.quizPoints;completeStep(4);persist();confetti();$('#lessonStage').innerHTML=`<article class="stage-panel quiz-result"><div class="result-icon">🏝️</div><div class="result-stars">${'⭐'.repeat(Math.max(1,Math.ceil(state.quizPoints/20)))}</div><h2>${state.quizPoints===100?'100分，满分通关！':'完成本单元！'}</h2><p>本次得分 ${state.quizPoints} 分（满分 100 分），共选错 ${state.quizMistakes} 次。成绩已经保存。</p><button class="primary-button" id="quizAgain">再挑战一次</button> <button class="ghost-button" id="nextUnit">${state.unit<courseUnits.length-1?'前往下一座岛':'回到学习地图'}</button></article>`;updateGlobalProgress();$('#quizAgain').onclick=renderQuiz;$('#nextUnit').onclick=()=>state.unit<courseUnits.length-1?showUnit(state.unit+1):showMap()}
 function confetti(){const c=$('#confetti');c.innerHTML=Array.from({length:34},(_,i)=>`<i style="left:${Math.random()*100}%;background:${['#ff735e','#ffd45b','#5b8def','#55b895','#8b72df'][i%5]};animation-delay:${Math.random()*.5}s"></i>`).join('');setTimeout(()=>c.innerHTML='',2400)}
 
 renderRoute();renderNav();renderMap();updateGlobalProgress();
 $('#continueButton').onclick=()=>{const i=courseUnits.findIndex((u,n)=>doneSet(n).size<5);showUnit(i<0?0:i)};$('#lessonBack').onclick=showMap;$('#mapButton').onclick=showMap;$('#menuButton').onclick=()=>$('#sidebar').classList.toggle('open');$$('.step-tab').forEach(b=>b.onclick=()=>setStep(Number(b.dataset.step)));document.addEventListener('click',e=>{if(innerWidth<780&&!$('#sidebar').contains(e.target)&&e.target!==$('#menuButton'))$('#sidebar').classList.remove('open')});
+function answerQuiz(n,b){const item=unit().quiz[state.quizIndex],feedback=$('#quizFeedback');if(!state.quizStarted){state.quizStarted=true;state.quizPoints=100}if(n===item[2]){updateGlobalProgress();b.classList.add('correct');$$('[data-quiz-answer]').forEach(x=>x.disabled=true);feedback.className='feedback success reasoning-feedback';feedback.innerHTML=quizReasoningHtml(item,`回答正确，当前 ${state.quizPoints} 分。`,'success');const next=$('#quizNext');if(next){next.disabled=false;next.onclick=()=>{state.quizIndex++;renderQuizQuestion()}}}else{state.quizPoints=Math.max(0,state.quizPoints-1);state.quizMistakes++;b.classList.add('wrong');b.disabled=true;updateGlobalProgress();feedback.className='feedback error reasoning-feedback';feedback.innerHTML=quizReasoningHtml(item,`选错一次，扣 1 分；当前 ${state.quizPoints} 分。`,'error')}}
