@@ -18,6 +18,10 @@
 
   const isUsableQuestion=item=>Array.isArray(item)&&typeof item[0]==='string'&&Array.isArray(item[1])&&item[1].length===3&&Number.isInteger(item[2])&&item[2]>=0&&item[2]<3&&!badQuestionPatterns.some(pattern=>pattern.test(item[0]));
   const normalize=(item,unit,index)=>({question:item[0],options:item[1],answer:item[2],explain:item[3]||'请结合题目条件检查计算和单位。',unit:unit.title,unitIndex:index});
+  const reasoningHtml=(item,scoreText)=>{
+    const explanation=String(item.explain||'请结合题目条件检查计算和单位。').trim().replace(/[。！？!?；;：:，,、]+$/,'');
+    return `<b>❌ ${escapeHtml(scoreText)}</b><b>🪜 完整解题思路：</b><ol><li>审题：先找出题目给出的数量、单位、位置或图形条件，明确题目要求计算、比较还是判断什么。</li><li>找关系：${escapeHtml(explanation)}</li><li>完成：按照上面的数量关系、运算顺序或图形关系逐步计算或判断，不要只凭选项猜答案。</li><li>检查：把得到的结果带回原题，核对数值、单位和实际意义，确认它确实回答了题目。</li></ol><p>再按这条思路读一遍题目，换一个选项试试。</p>`;
+  };
   function buildExamQuestions(){
     const pools=courseUnits.map((unit,unitIndex)=>({unit,unitIndex,items:(unit.quiz||[]).filter(isUsableQuestion).map(item=>normalize(item,unit,unitIndex)),cursor:0}));
     const questions=[];
@@ -121,8 +125,8 @@
     }
     if(!examState.penalized){examState.points=Math.max(0,examState.points-2);examState.mistakes++;examState.penalized=true}
     button.disabled=true;button.classList.add('wrong');
-    feedback.className='feedback error';
-    feedback.textContent=`这道题扣2分，当前得分 ${examState.points} 分。再读一遍题目，换个选项试试。`;
+    feedback.className='feedback error reasoning-feedback';
+    feedback.innerHTML=reasoningHtml(item,`这道题扣2分，当前得分 ${examState.points} 分。`);
     updateExamTop();
   }
   function renderExamResult(){
