@@ -6,6 +6,22 @@
 
 [打开 Vercel 演示站点](https://xiaoxue-math-island.vercel.app/)
 
+## 目录布局
+
+根目录只保留网站总入口和项目说明，课程页面、通用资源、分册数据与教材核对文档按职责分层：
+
+```text
+index.html                         网站总入口
+courses/                            八册课程页面
+assets/css/                         总入口与课程页样式
+assets/js/core/                     通用交互、页面骨架、考试逻辑
+assets/js/data/<册次>/              各册课程数据
+docs/curriculum/                   教材核对说明
+README.md                           项目建设与维护规范
+```
+
+课程页面统一从 `../assets/` 加载资源，并从 `../index.html` 返回教材大厅；Vercel 的 Root Directory 仍保持为仓库根目录。
+
 ## 一、当前成果
 
 - 入口首页覆盖三年级至六年级上、下册，共 8 个教材入口。
@@ -87,34 +103,30 @@
 | 文件 | 职责 |
 | --- | --- |
 | `index.html` | 3—6 年级总入口和教材卡片状态 |
-| `portal.css` | 总入口首页样式 |
-| `grade3-up.html` | 三年级上册课程地图与学习页骨架 |
-| `grade3-down.html` | 三年级下册课程地图与学习页骨架 |
-| `styles.css` | 课程页、五步学习、互动和响应式样式 |
-| `course-data.js` | 三上模块元数据及每单元核心内容、首个生活例子、前 6 道题 |
-| `course-enhancements.js` | 为每个三上模块补充 2 个生活例子和 4 道题，合并为 3 例、10 题 |
-| `course-data-g3-down.js` | 三下模块元数据及每模块核心内容、首个生活例子、前 6 道题 |
-| `course-enhancements-g3-down.js` | 为每个三下模块补充 2 个生活例子和 4 道题 |
-| `grade4-up.html` 至 `grade6-down.html` | 四至六年级六册课程入口页 |
-| `course-kit.js` | 四至六年级课程数据装配、选项轮换和统一 3 例 10 题结构 |
-| `exam-mode.js` | 每册末尾整册考试入口、50 题轮换抽题、实时计分和考试成绩 |
-| `course-page.js` | 四至六年级共用课程页面骨架 |
-| `course-data-g4-up.js` 至 `course-data-g6-down.js` | 六册完整课程数据 |
-| `app.js` | 通用渲染、五步交互、答题、星星、进度与 `localStorage` |
-| `教材核对说明.md` | 当前册次的教材来源、核对日期和模块对应关系 |
-| `教材核对说明-三年级下册.md` | 三下官方教材目录、课题与知识边界核对记录 |
+| `courses/grade3-up.html`、`courses/grade3-down.html` | 三年级上下册课程页面 |
+| `courses/grade4-up.html` 至 `courses/grade6-down.html` | 四至六年级六册课程页面 |
+| `assets/css/portal.css` | 总入口首页样式 |
+| `assets/css/styles.css` | 课程页、五步学习、互动和响应式样式 |
+| `assets/js/core/app.js` | 通用渲染、五步交互、答题、星星、进度与 `localStorage` |
+| `assets/js/core/course-page.js` | 四至六年级共用课程页面骨架 |
+| `assets/js/core/course-kit.js` | 四至六年级课程数据装配、选项轮换和统一 3 例 10 题结构 |
+| `assets/js/core/exam-mode.js` | 每册末尾整册考试入口、50 题轮换抽题、实时计分和考试成绩 |
+| `assets/js/data/grade3-up/` | 三上模块数据与增强数据 |
+| `assets/js/data/grade3-down/` | 三下模块数据与增强数据 |
+| `assets/js/data/grade4-up/` 至 `assets/js/data/grade6-down/` | 四至六年级六册完整课程数据 |
+| `docs/curriculum/教材核对说明-*.md` | 各册教材来源、核对日期和模块对应关系 |
 
 三年级脚本加载顺序不可颠倒：先加载基础课程数据，再加载增强数据，最后加载应用逻辑。
 
 ```html
-<script src="course-data.js"></script>
-<script src="course-enhancements.js"></script>
-<script src="app.js?v=3"></script>
+<script src="../assets/js/data/grade3-up/course-data.js"></script>
+<script src="../assets/js/data/grade3-up/course-enhancements.js"></script>
+<script src="../assets/js/core/app.js?v=15"></script>
 ```
 
 修改已被浏览器缓存的 JavaScript 后，应同步更新查询版本号，例如把 `?v=3` 改为 `?v=4`。
 
-四至六年级采用等价但更精简的共享装配方案，顺序为 `course-kit.js` → 当前册数据文件 → `course-page.js` → `app.js` → `exam-mode.js`。每册数据文件直接装配为每模块 3 个生活例子、10 道题，不再需要单独增强文件。`course-kit.js` 不再自动生成脱离情境的复习题，缺少手写检查题时也会根据具体例子生成带完整条件的题目。
+四至六年级采用等价但更精简的共享装配方案，顺序为 `assets/js/core/course-kit.js` → `assets/js/data/<册次>/course-data.js` → `assets/js/core/course-page.js` → `assets/js/core/app.js` → `assets/js/core/exam-mode.js`。每册数据文件直接装配为每模块 3 个生活例子、10 道题，不再需要单独增强文件。`course-kit.js` 不再自动生成脱离情境的复习题，缺少手写检查题时也会根据具体例子生成带完整条件的题目。
 
 ### 单元数据结构
 
@@ -171,7 +183,7 @@ const STORE_KEY = 'mathIslandG3Down2022VerifiedV1';
 4. 查看教材目录和相关正文，逐项确认单元、课题、综合实践、数学好玩和总复习内容。
 5. 为每一册建立独立的“教材核对说明”文档，不覆盖已有册次记录。
 
-三年级上册当前核对依据见 [教材核对说明.md](教材核对说明.md)。
+三年级上册当前核对依据见 [docs/curriculum/教材核对说明-三年级上册.md](docs/curriculum/教材核对说明-三年级上册.md)。
 
 ### 内容边界
 
@@ -202,8 +214,8 @@ const STORE_KEY = 'mathIslandG3Down2022VerifiedV1';
 2. 新建独立核对文件，例如 `教材核对说明-三年级下册.md`。
 3. 列出全部单元、综合实践、数学好玩和整册复习模块，确定模块总数。
 4. 为每个模块写清核心目标、内容边界和五步学习设计。
-5. 复制课程页骨架，命名为 `grade3-down.html`，更新标题、地图文案和册次标识。
-6. 新建册次数据文件，例如 `course-data-g3-down.js` 和 `course-enhancements-g3-down.js`。
+5. 在 `courses/` 下复制课程页骨架，命名为 `grade3-down.html`，更新标题、地图文案和册次标识。
+6. 在 `assets/js/data/grade3-down/` 下新建 `course-data.js` 和 `course-enhancements.js`。
 7. 保持每模块“1 个核心故事、1 个动手互动、1 套分步解题、3 个生活例子、10 道题”的标准。
 8. 为该册配置独立 `localStorage` 键；若继续复用 `app.js`，先将存储键和册次文案改为可配置值，且不得影响已完成的三上页面。
 9. 在 `index.html` 中把对应教材卡片改为可点击的“已开放”，并更新模块、关卡和题量统计。
@@ -213,13 +225,13 @@ const STORE_KEY = 'mathIslandG3Down2022VerifiedV1';
 
 | 册次 | 页面命名示例 | 数据后缀示例 |
 | --- | --- | --- |
-| 三年级下册 | `grade3-down.html` | `g3-down` |
-| 四年级上册 | `grade4-up.html` | `g4-up` |
-| 四年级下册 | `grade4-down.html` | `g4-down` |
-| 五年级上册 | `grade5-up.html` | `g5-up` |
-| 五年级下册 | `grade5-down.html` | `g5-down` |
-| 六年级上册 | `grade6-up.html` | `g6-up` |
-| 六年级下册 | `grade6-down.html` | `g6-down` |
+| 三年级下册 | `courses/grade3-down.html` | `grade3-down` |
+| 四年级上册 | `courses/grade4-up.html` | `grade4-up` |
+| 四年级下册 | `courses/grade4-down.html` | `grade4-down` |
+| 五年级上册 | `courses/grade5-up.html` | `grade5-up` |
+| 五年级下册 | `courses/grade5-down.html` | `grade5-down` |
+| 六年级上册 | `courses/grade6-up.html` | `grade6-up` |
+| 六年级下册 | `courses/grade6-down.html` | `grade6-down` |
 
 ## 八、验收标准
 
@@ -253,9 +265,9 @@ const STORE_KEY = 'mathIslandG3Down2022VerifiedV1';
 在项目目录执行：
 
 ```bash
-node --check course-data.js
-node --check course-enhancements.js
-node --check app.js
+node --check assets/js/data/grade3-up/course-data.js
+node --check assets/js/data/grade3-up/course-enhancements.js
+node --check assets/js/core/app.js
 rg -n "小白|6道|6题|1个生活" . --glob '!README.md' --glob '!tmp/**'
 ```
 
@@ -272,8 +284,8 @@ python3 -m http.server 2103 --bind 127.0.0.1
 然后访问：
 
 - 教材总入口：<http://127.0.0.1:2103/>
-- 三年级上册：<http://127.0.0.1:2103/grade3-up.html>
-- 三年级下册：<http://127.0.0.1:2103/grade3-down.html>
+- 三年级上册：<http://127.0.0.1:2103/courses/grade3-up.html>
+- 三年级下册：<http://127.0.0.1:2103/courses/grade3-down.html>
 
 `127.0.0.1` 仅供本机访问。关闭运行服务器的终端后，页面将无法访问；需要再次执行上述命令。
 
