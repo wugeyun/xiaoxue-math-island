@@ -67,6 +67,12 @@
     else if(examNav&&examNav.dataset.examStatus!==`${record.completed?'done':'new'}-${record.bestScore||0}`)examNav.outerHTML=navHtml();
     bindExamEntry();
   }
+  function setExamNavActive(){
+    const nav=$('#chapterNav');
+    const examNav=nav&&nav.querySelector('[data-exam-nav]');
+    if(!nav||!examNav)return;
+    nav.querySelectorAll('.nav-item').forEach(item=>item.classList.toggle('active',item===examNav));
+  }
   function updateMapCopy(){
     const heading=$('#mapView .course-hero h1 em');
     if(heading&&!heading.dataset.examCopy){heading.textContent=`${courseUnits.length}座学习小岛 + 1座考试岛`;heading.dataset.examCopy='1'}
@@ -107,6 +113,8 @@
       return;
     }
     examState.active=true;examState.index=0;examState.points=100;examState.mistakes=0;examState.started=false;examState.penalized=false;
+    appendExamEntries();
+    setExamNavActive();
     showExamLesson();
     renderExamQuestion();
   }
@@ -162,6 +170,7 @@
     if(mapButton)mapButton.onclick=originalMapButton;
     if(typeof originalMapButton==='function')originalMapButton();
     else if(typeof window.showMap==='function')window.showMap();
+    if(typeof window.renderNav==='function')window.renderNav();
     setTimeout(()=>{appendExamEntries();updateMapCopy()},0);
   }
   function installObservers(){
