@@ -73,6 +73,15 @@
     if(!nav||!examNav)return;
     nav.querySelectorAll('.nav-item').forEach(item=>item.classList.toggle('active',item===examNav));
   }
+  function stopExamForUnitSelection(){
+    examState.active=false;
+    const examNav=$('#chapterNav [data-exam-nav]');
+    if(examNav)examNav.classList.remove('active');
+    const steps=$('.learning-steps');
+    if(steps)steps.style.display='';
+    if(lessonBack)lessonBack.onclick=originalLessonBack;
+    if(mapButton)mapButton.onclick=originalMapButton;
+  }
   function updateMapCopy(){
     const heading=$('#mapView .course-hero h1 em');
     if(heading&&!heading.dataset.examCopy){heading.textContent=`${courseUnits.length}座学习小岛 + 1座考试岛`;heading.dataset.examCopy='1'}
@@ -163,11 +172,7 @@
     $('#examBack').onclick=exitExam;
   }
   function exitExam(){
-    examState.active=false;
-    const steps=$('.learning-steps');
-    if(steps)steps.style.display='';
-    if(lessonBack)lessonBack.onclick=originalLessonBack;
-    if(mapButton)mapButton.onclick=originalMapButton;
+    stopExamForUnitSelection();
     if(typeof originalMapButton==='function')originalMapButton();
     else if(typeof window.showMap==='function')window.showMap();
     if(typeof window.renderNav==='function')window.renderNav();
@@ -184,4 +189,8 @@
   examStyle.textContent='.exam-card,.exam-nav-item{--unit-color:#d45f78}.exam-card .unit-no,.exam-source{color:var(--unit-color)}.exam-stage .quiz-head{align-items:flex-start}.exam-source{background:#fff0f3;border-radius:999px;padding:8px 12px;font-size:12px;white-space:nowrap}.exam-result strong{color:var(--unit-color);font-size:26px}.exam-card.complete{border-color:var(--unit-color)}.reasoning-feedback .next-question-button{margin-top:10px}';
   document.head.appendChild(examStyle);
   installObservers();
+  document.addEventListener('click',event=>{
+    const target=event.target instanceof Element?event.target.closest('#chapterNav [data-unit]'):null;
+    if(target&&examState.active)stopExamForUnitSelection();
+  },true);
 })();
