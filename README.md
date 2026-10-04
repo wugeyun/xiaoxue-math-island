@@ -22,6 +22,12 @@ README.md                           项目建设与维护规范
 
 课程页面统一从 `../assets/` 加载资源，并从 `../index.html` 返回教材大厅；Vercel 的 Root Directory 仍保持为仓库根目录。
 
+## 六年级 v2.0 更新（2026-10-04）
+
+六上按国家平台北师大版 **2026年7月第1版、根据2022年版课标修订** 重写，现有13个模块：分数除法、圆、用字母表示（二）、制订节水方案、分数的应用、比的认识、确定位置、五子棋、百分数的认识与应用（一）、观察物体（二）、数据的表示和分析（三）、制订营养食谱、总复习。六下按平台当前提供的教材完整重写7个模块；课程的v2.0标记指网站课程版本，不代表六下教材也已修订。
+
+版本号只显示在首页底部和六年级课程页左下角。六年级直接提供完整课程数据，避开旧装配器自动拼题。原创SVG图解、播放/暂停/重播与手动步进、知识图册由 `assets/js/core/grade6-visuals.js` 和 `assets/css/grade6-visuals.css` 提供，不使用外部图片服务。上下册各保留3例/10题和50题考试，分别使用新的进度键，旧版记录保留。教材核对证据和原目录历史见对应说明文档。
+
 ## 一、当前成果
 
 - 入口首页覆盖三年级至六年级上、下册，共 8 个教材入口。
@@ -30,8 +36,8 @@ README.md                           项目建设与维护规范
 - 三年级下册共 11 个学习模块：7 个单元、2 个综合实践模块、1 个数学好玩和 1 个整册复习模块。
 - 每个模块固定包含 5 个学习关卡、3 个生活应用例子和 10 道闯关题。
 - 每册学习地图末尾增加 1 次整册考试；每次考试 50 题，每题 2 分，满分 100 分。
-- 全平台共 81 个学习模块、405 个互动关卡、243 个生活应用例子、810 道闯关题和 8 次整册考试（400 道考试题）。
-- 全平台课程与考试题目合计 1210 道；整册考试按单元轮换抽题，确保每册全部模块都有覆盖。
+- 全平台共 84 个学习模块、420 个互动关卡、252 个生活应用例子、840 道闯关题和 8 次整册考试（400 道考试题）。
+- 全平台课程与考试题目合计 1240 道；整册考试按单元轮换抽题，确保每册全部模块都有覆盖。
 - 学习进度保存在浏览器 `localStorage` 中，不需要账号或服务器数据库。
 
 ## 二、建设目标
@@ -109,7 +115,8 @@ README.md                           项目建设与维护规范
 | `assets/css/styles.css` | 课程页、五步学习、互动和响应式样式 |
 | `assets/js/core/app.js` | 通用渲染、五步交互、答题、星星、进度与 `localStorage` |
 | `assets/js/core/course-page.js` | 四至六年级共用课程页面骨架 |
-| `assets/js/core/course-kit.js` | 四至六年级课程数据装配、选项轮换和统一 3 例 10 题结构 |
+| `assets/js/core/course-kit.js` | 四、五年级及六年级旧版的数据装配 |
+| `assets/js/core/grade6-visuals.js`、`assets/css/grade6-visuals.css` | 六年级v2.0原创SVG图解、动画控制、知识图册和题目插画 |
 | `assets/js/core/exam-mode.js` | 每册末尾整册考试入口、50 题轮换抽题、实时计分和考试成绩 |
 | `assets/js/data/grade3-up/` | 三上模块数据与增强数据 |
 | `assets/js/data/grade3-down/` | 三下模块数据与增强数据 |
@@ -126,7 +133,7 @@ README.md                           项目建设与维护规范
 
 修改已被浏览器缓存的 JavaScript 后，应同步更新查询版本号，例如把 `?v=3` 改为 `?v=4`。
 
-四至六年级采用等价但更精简的共享装配方案，顺序为 `assets/js/core/course-kit.js` → `assets/js/data/<册次>/course-data.js` → `assets/js/core/course-page.js` → `assets/js/core/app.js` → `assets/js/core/exam-mode.js`。每册数据文件直接装配为每模块 3 个生活例子、10 道题，不再需要单独增强文件。`course-kit.js` 不再自动生成脱离情境的复习题，缺少手写检查题时也会根据具体例子生成带完整条件的题目。
+四、五年级采用等价但更精简的共享装配方案，顺序为 `assets/js/core/course-kit.js` → `assets/js/data/<册次>/course-data.js` → `assets/js/core/course-page.js` → `assets/js/core/app.js` → `assets/js/core/exam-mode.js`。这些册次的数据文件装配为每模块 3 个生活例子、10 道题，不再需要单独增强文件。六年级v2.0直接编写完整数据，加载顺序为 `grade6-visuals.js` → `assets/js/data/<册次>/course-data.js` → `course-page.js` → `app.js` → `exam-mode.js`。`course-kit.js` 不再自动生成脱离情境的复习题，缺少手写检查题时也会根据具体例子生成带完整条件的题目。
 
 ### 单元数据结构
 
