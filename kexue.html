@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>六上科学 · 知识点闯关</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --ink: #1a2f3a;
+    --ink-soft: #3d5a66;
+    --paper: #f3f8f6;
+    --mint: #2a9d8f;
+    --mint-deep: #1d7a6f;
+    --sun: #e9c46a;
+    --coral: #e76f51;
+    --sky: #4ea8c9;
+    --ok: #2a9d8f;
+    --bad: #e76f51;
+    --line: rgba(26, 47, 58, 0.12);
+    --shadow: 0 18px 40px rgba(26, 47, 58, 0.12);
+    --radius: 22px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    color: var(--ink);
+    font-family: "Noto Sans SC", system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 600px at 10% -10%, #c9ebe4 0%, transparent 55%),
+      radial-gradient(900px 500px at 100% 0%, #f7e7b8 0%, transparent 50%),
+      radial-gradient(800px 500px at 80% 100%, #b8dce8 0%, transparent 45%),
+      linear-gradient(180deg, #eef7f4 0%, var(--paper) 40%, #e8f1f4 100%);
+    min-height: 100vh;
+  }
+
+  .wrap {
+    width: min(720px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 28px 0 56px;
+  }
+
+  .brand {
+    font-family: "ZCOOL KuaiLe", cursive;
+    font-size: clamp(1.8rem, 5vw, 2.6rem);
+    letter-spacing: 0.04em;
+    margin: 0 0 6px;
+    line-height: 1.15;
+  }
+
+  .sub {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+  }
+
+  .screen { display: none; animation: rise 0.45s ease both; }
+  .screen.active { display: block; }
+
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .hero {
+    padding: 48px 8px 24px;
+    text-align: center;
+  }
+
+  .hero .badge {
+    display: inline-block;
+    margin-bottom: 18px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: rgba(42, 157, 143, 0.15);
+    color: var(--mint-deep);
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+
+  .hero p {
+    max-width: 34em;
+    margin: 14px auto 28px;
+    color: var(--ink-soft);
+    line-height: 1.7;
+  }
+
+  .unit-picks {
+    display: grid;
+    gap: 10px;
+    margin: 0 auto 22px;
+    max-width: 420px;
+    text-align: left;
+  }
+
+  .unit-picks label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255,255,255,0.72);
+    cursor: pointer;
+    transition: border-color .2s, transform .15s;
+  }
+  .unit-picks label:hover { border-color: var(--mint); transform: translateY(-1px); }
+  .unit-picks input { accent-color: var(--mint); width: 18px; height: 18px; }
+
+  .btn {
+    appearance: none;
+    border: none;
+    cursor: pointer;
+    font: inherit;
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 13px 28px;
+    transition: transform .15s ease, box-shadow .15s ease, background .2s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--mint) 0%, var(--sky) 100%);
+    color: #fff;
+    box-shadow: 0 10px 24px rgba(42, 157, 143, 0.35);
+  }
+  .btn-primary:hover { box-shadow: 0 14px 28px rgba(42, 157, 143, 0.45); }
+  .btn-ghost {
+    background: rgba(255,255,255,0.75);
+    color: var(--ink);
+    border: 1.5px solid var(--line);
+  }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 18px; }
+
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .topbar .meta { color: var(--ink-soft); font-size: 0.9rem; font-weight: 500; }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.8);
+    border: 1px solid var(--line);
+    font-size: 0.82rem;
+  }
+
+  .progress {
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(26,47,58,0.08);
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress > i {
+    display: block;
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--mint), var(--sun));
+    transition: width .35s ease;
+  }
+
+  .panel {
+    background: rgba(255,255,255,0.86);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.9);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 22px 20px 20px;
+  }
+
+  .q-type {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 4px 10px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+  .q-type.choice { background: rgba(78,168,201,0.18); color: #1f6f8a; }
+  .q-type.judge { background: rgba(233,196,106,0.35); color: #8a6a1a; }
+
+  .q-unit {
+    margin: 0 0 8px;
+    color: var(--mint-deep);
+    font-size: 0.82rem;
+    font-weight: 700;
+  }
+
+  .q-text {
+    margin: 0 0 18px;
+    font-size: clamp(1.05rem, 3.2vw, 1.25rem);
+    line-height: 1.55;
+    font-weight: 700;
+  }
+
+  .options { display: grid; gap: 10px; }
+  .opt {
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color .15s, background .15s, transform .12s;
+  }
+  .opt:hover:not(:disabled) { border-color: var(--mint); transform: translateX(2px); }
+  .opt:disabled { cursor: default; }
+  .opt.correct {
+    border-color: var(--ok);
+    background: rgba(42,157,143,0.12);
+  }
+  .opt.wrong {
+    border-color: var(--bad);
+    background: rgba(231,111,81,0.12);
+  }
+  .opt.dim { opacity: 0.55; }
+
+  .explain {
+    display: none;
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(231,111,81,0.1);
+    border-left: 4px solid var(--coral);
+    line-height: 1.65;
+    color: var(--ink);
+    animation: rise .3s ease both;
+  }
+  .explain.show { display: block; }
+  .explain strong { color: var(--coral); }
+
+  .explain.ok {
+    background: rgba(42,157,143,0.1);
+    border-left-color: var(--ok);
+  }
+  .explain.ok strong { color: var(--mint-deep); }
+
+  .actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin: 22px 0;
+  }
+  .stat {
+    text-align: center;
+    padding: 16px 8px;
+    border-radius: 16px;
+    background: rgba(255,255,255,0.75);
+    border: 1px solid var(--line);
+  }
+  .stat b {
+    display: block;
+    font-family: "ZCOOL KuaiLe", cursive;
+    font-size: 1.8rem;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .stat span { color: var(--ink-soft); font-size: 0.85rem; }
+
+  .wrong-list { display: grid; gap: 12px; margin-top: 10px; }
+  .wrong-item {
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(255,255,255,0.8);
+    border: 1px solid var(--line);
+  }
+  .wrong-item h4 { margin: 0 0 8px; font-size: 1rem; }
+  .wrong-item p { margin: 4px 0; font-size: 0.92rem; line-height: 1.55; color: var(--ink-soft); }
+  .tag-bad { color: var(--bad); font-weight: 700; }
+  .tag-ok { color: var(--mint-deep); font-weight: 700; }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-soft);
+    padding: 20px;
+  }
+
+  footer.note {
+    margin-top: 28px;
+    text-align: center;
+    color: rgba(26,47,58,0.45);
+    font-size: 0.78rem;
+  }
+
+  @media (max-width: 480px) {
+    .wrap { width: calc(100% - 20px); padding-top: 18px; }
+    .panel { padding: 18px 14px; }
+    .stats { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 首页 -->
+    <section id="screen-home" class="screen active">
+      <div class="hero">
+        <div class="badge">六年级上册 · 科学</div>
+        <h1 class="brand">知识点闯关</h1>
+        <p>按《知识点清单》四单元共28课全覆盖出题（选择+判断）。默认按课文顺序复习；答错立刻给解答，并记入错题本。</p>
+        <div class="unit-picks" id="unitPicks">
+          <label><input type="checkbox" value="u1" checked /> 第一单元 微小世界</label>
+          <label><input type="checkbox" value="u2" checked /> 第二单元 工具与技术</label>
+          <label><input type="checkbox" value="u3" checked /> 第三单元 地球的运动</label>
+          <label><input type="checkbox" value="u4" checked /> 第四单元 计量时间</label>
+        </div>
+
+        <div class="unit-picks" style="margin-top:8px">
+          <label><input type="radio" name="mode" value="seq" checked /> 顺序复习（推荐，按清单顺序）</label>
+          <label><input type="radio" name="mode" value="rand" /> 随机练习</label>
+        </div>
+        <p class="sub" id="bankCount" style="margin:8px 0 0;text-align:center"></p>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnStart">开始答题</button>
+          <button class="btn btn-ghost" id="btnWrongBookHome">查看错题本</button>
+        </div>
+      </div>
+      <footer class="note">依据《六上科学知识点清单》整理 · 本地单页，进度与错题保存在本机</footer>
+    </section>
+
+    <!-- 答题 -->
+    <section id="screen-quiz" class="screen">
+      <div class="topbar">
+        <div class="meta" id="progressText">第 1 / 10 题</div>
+        <div class="pill" id="scorePill">正确 0 · 错误 0</div>
+      </div>
+      <div class="progress"><i id="progressBar"></i></div>
+      <div class="panel">
+        <div class="q-type" id="qType">选择题</div>
+        <p class="q-unit" id="qUnit"></p>
+        <h2 class="q-text" id="qText"></h2>
+        <div class="options" id="options"></div>
+        <div class="explain" id="explain"></div>
+        <div class="actions">
+          <button class="btn btn-ghost" id="btnQuit">退出</button>
+          <button class="btn btn-primary" id="btnNext" disabled>下一题</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 结果 -->
+    <section id="screen-result" class="screen">
+      <div class="hero" style="padding-top:24px">
+        <h1 class="brand" id="resultTitle">本轮完成</h1>
+        <p id="resultMsg">继续加油！</p>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="statTotal">0</b><span>总题数</span></div>
+        <div class="stat"><b id="statOk" style="color:var(--ok)">0</b><span>答对</span></div>
+        <div class="stat"><b id="statBad" style="color:var(--bad)">0</b><span>答错</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnRetry">再练一轮</button>
+        <button class="btn btn-ghost" id="btnShowWrong">本轮错题</button>
+        <button class="btn btn-ghost" id="btnHome">回首页</button>
+      </div>
+    </section>
+
+    <!-- 错题本 -->
+    <section id="screen-wrong" class="screen">
+      <div class="topbar">
+        <h1 class="brand" style="font-size:1.6rem;margin:0">错题本</h1>
+        <button class="btn btn-ghost" id="btnClearWrong" style="padding:8px 16px">清空</button>
+      </div>
+      <p class="sub" id="wrongSummary">还没有错题，真棒！</p>
+      <div class="wrong-list" id="wrongList"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnPracticeWrong">重做错题</button>
+        <button class="btn btn-ghost" id="btnBackFromWrong">返回</button>
+      </div>
+    </section>
+  </div>
+
+<script>
+/** @typedef {{id:string, unit:string, unitKey:string, type:'choice'|'judge', q:string, options?:string[], answer:number|boolean, explain:string, tag?:string}} Q */
+
+const BANK = [{"id": "u1l1-01", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "judge", "q": "人们常用放大镜观察微小的物体或物体的细微部分。", "answer": true, "explain": "放大镜是观察微小物体或细微部分的常用工具。", "tag": "u1l1"}, {"id": "u1l1-02", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "judge", "q": "用放大镜观察时，细节更多，视野也会变大。", "answer": false, "explain": "细节更多，但视野会变小。", "tag": "u1l1"}, {"id": "u1l1-03", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "choice", "q": "放大镜下物体图像的特点是？", "options": ["图像放大", "图像大小不变", "图像缩小", "图像消失"], "answer": 0, "explain": "放大镜使图像放大。", "tag": "u1l1"}, {"id": "u1l1-04", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "choice", "q": "平面玻璃片下物体图像的特点是？", "options": ["图像放大", "图像大小不变", "图像缩小", "图像颠倒"], "answer": 1, "explain": "平面玻璃片中央和边缘一样厚，图像大小不变。", "tag": "u1l1"}, {"id": "u1l1-05", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "choice", "q": "近视眼镜（凹透镜）下物体图像的特点是？", "options": ["图像放大", "图像大小不变", "图像缩小", "变成彩色"], "answer": 2, "explain": "近视眼镜中央薄、边缘厚，图像缩小。", "tag": "u1l1"}, {"id": "u1l1-06", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "choice", "q": "放大镜镜片的结构特点是？", "options": ["中央厚、边缘薄", "中央和边缘一样厚", "中央薄、边缘厚", "完全不透明"], "answer": 0, "explain": "放大镜是凸透镜：中央厚、边缘薄。", "tag": "u1l1"}, {"id": "u1l1-07", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "judge", "q": "中央厚、边缘薄的透明物体能把图像放大。", "answer": true, "explain": "这是凸透镜放大图像的基本条件。", "tag": "u1l1"}, {"id": "u1l1-08", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "choice", "q": "放大镜的镜片又叫？", "options": ["凹透镜", "凸透镜", "平面镜", "三棱镜"], "answer": 1, "explain": "放大镜的镜片叫凸透镜。", "tag": "u1l1"}, {"id": "u1l1-09", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "judge", "q": "放大倍数越大，镜片凸度越大，视野范围也越大。", "answer": false, "explain": "放大倍数越大，凸度越大，细节越清晰，但视野越小。", "tag": "u1l1"}, {"id": "u1l1-10", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "choice", "q": "正确使用放大镜的方法之一是？", "options": ["眼睛、物体、放大镜三者随意乱动", "物体与眼距不变，放大镜在中间来回移动", "把放大镜贴在物体上不动", "只能闭上一只眼"], "answer": 1, "explain": "方法一：物与眼距不变，放大镜在中间来回移动。", "tag": "u1l1"}, {"id": "u1l1-11", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "judge", "q": "可以把放大镜放在眼前，移动物体直到图像大而清楚。", "answer": true, "explain": "这是使用放大镜的第二种正确方法。", "tag": "u1l1"}, {"id": "u1l1-12", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "judge", "q": "烧杯、矿泉水瓶加满水，或在塑料膜上滴一滴清水，都可以制成简易放大镜。", "answer": true, "explain": "中央厚、边缘薄的透明水体也能放大图像。", "tag": "u1l1"}, {"id": "u1l1-13", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "judge", "q": "观察时，放大倍数越大的放大镜，效果一定越好。", "answer": false, "explain": "不一定。倍数过大可能看不清全貌，如读书时只能看到笔画。", "tag": "u1l1"}, {"id": "u1l1-14", "unitKey": "u1", "unit": "第一单元 · 研究放大镜", "type": "choice", "q": "什么样的物体具有放大图像的功能？", "options": ["任何厚玻璃", "中央厚、边缘薄的透明物体", "中央薄、边缘厚的透明物体", "不透明物体"], "answer": 1, "explain": "具备放大功能的是中央厚、边缘薄的透明物体。", "tag": "u1l1"}, {"id": "u1l2-01", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "judge", "q": "把两个凸透镜组合起来，能把物体的图像放得更大。", "answer": true, "explain": "组合凸透镜可获得更大放大倍数。", "tag": "u1l2"}, {"id": "u1l2-02", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "judge", "q": "组合凸透镜的放大倍数小于其中任意一个放大镜。", "answer": false, "explain": "组合后的放大倍数大于其中任意一个。", "tag": "u1l2"}, {"id": "u1l2-03", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "choice", "q": "荷兰生物学家列文虎克制成的显微镜约能放大？", "options": ["近30倍", "近100倍", "近300倍", "近3000倍"], "answer": 2, "explain": "列文虎克制成了可放大近300倍的显微镜。", "tag": "u1l2"}, {"id": "u1l2-04", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "judge", "q": "我们制作的组合凸透镜，相当于一个简易显微镜。", "answer": true, "explain": "组合凸透镜相当于简易显微镜。", "tag": "u1l2"}, {"id": "u1l2-05", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "choice", "q": "制作组合凸透镜时，两个放大镜应怎样放置？", "options": ["互相垂直", "平行并重叠，再上下移动调节", "随意斜放", "只放一个"], "answer": 1, "explain": "应平行重叠放置，再上下移动第二个放大镜。", "tag": "u1l2"}, {"id": "u1l2-06", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "judge", "q": "调节两个放大镜之间的距离，可以获得大而清晰的图像。", "answer": true, "explain": "通过调节间距可获得清晰放大图像。", "tag": "u1l2"}, {"id": "u1l2-07", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "choice", "q": "怎样组合才能把图像放得更大更清晰？", "options": ["倍数大的在上、小的在下", "倍数小的在上、大的在下", "两个倍数必须一样", "随便叠放即可"], "answer": 1, "explain": "放大倍数小的在上方，大的在下方，再微调固定。", "tag": "u1l2"}, {"id": "u1l2-08", "unitKey": "u1", "unit": "第一单元 · 怎样放得更大", "type": "judge", "q": "用放大倍数更大的放大镜来组合，通常能看到更多细节。", "answer": true, "explain": "组合放大倍数更大，能看到更多细节。", "tag": "u1l2"}, {"id": "u1l3-01", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "为了研究更细微的结构，人们使用显微镜观察。", "answer": true, "explain": "显微镜用于研究物体更细微的结构。", "tag": "u1l3"}, {"id": "u1l3-02", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "choice", "q": "手持式简易显微镜中，直接靠近物体、做第一次放大的是？", "options": ["目镜", "物镜", "调焦环", "手柄"], "answer": 1, "explain": "物镜靠近物体，完成第一次放大。", "tag": "u1l3"}, {"id": "u1l3-03", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "choice", "q": "调节图像清晰度的部件是？", "options": ["目镜", "物镜", "调焦环", "LED光源"], "answer": 2, "explain": "调焦环用来调节清晰度。", "tag": "u1l3"}, {"id": "u1l3-04", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "choice", "q": "位于上方、把物镜图像进一步放大的是？", "options": ["物镜", "目镜", "反光镜", "载物台"], "answer": 1, "explain": "目镜在上方，进一步放大。", "tag": "u1l3"}, {"id": "u1l3-05", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "choice", "q": "LED光源的作用是？", "options": ["改变放大倍数", "提供照明使图像更明亮", "调节焦距", "支撑手柄"], "answer": 1, "explain": "LED光源提供充足照明。", "tag": "u1l3"}, {"id": "u1l3-06", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "手柄方便持握，内置电池可提供电力。", "answer": true, "explain": "手柄既便于持握，也内置电池供电。", "tag": "u1l3"}, {"id": "u1l3-07", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "靠近眼睛的透镜叫物镜，靠近物体的叫目镜。", "answer": false, "explain": "靠近眼睛的是目镜，靠近物体的是物镜。", "tag": "u1l3"}, {"id": "u1l3-08", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "choice", "q": "手持式简易显微镜正确使用顺序是？", "options": ["调焦→开光源→对准→观察", "打开光源→物镜对准物体→调焦→从目镜观察记录", "先观察再开灯", "只对光不调焦"], "answer": 1, "explain": "打开光源→对准→调焦→观察记录。", "tag": "u1l3"}, {"id": "u1l3-09", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "用简易显微镜可清晰看到昆虫足上很小的刚毛。", "answer": true, "explain": "放大后能看到肉眼难见的刚毛等细节。", "tag": "u1l3"}, {"id": "u1l3-10", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "choice", "q": "手持式简易显微镜一般放大倍数约为？", "options": ["2～10倍", "20～250倍", "1000～2000倍", "几百万倍"], "answer": 1, "explain": "一般情况下为20～250倍。", "tag": "u1l3"}, {"id": "u1l3-11", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "手持式简易显微镜看到的像是倒立的像。", "answer": true, "explain": "看到的一般是倒立的像。", "tag": "u1l3"}, {"id": "u1l3-12", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "观察时透明罩要紧贴物体。", "answer": true, "explain": "透明罩要紧贴物体观察。", "tag": "u1l3"}, {"id": "u1l3-13", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "图像越大，视野越大；图像越小，视野越小。", "answer": false, "explain": "图像越大视野越小；图像越小视野越大。", "tag": "u1l3"}, {"id": "u1l3-14", "unitKey": "u1", "unit": "第一单元 · 用简易显微镜观察", "type": "judge", "q": "与放大镜相比，手持式简易显微镜下观察视野会变小。", "answer": true, "explain": "放大更多时，观察视野变小。", "tag": "u1l3"}, {"id": "u1l4-01", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "choice", "q": "光学显微镜主要结构不包括？", "options": ["目镜和物镜", "载物台", "反光镜", "发动机"], "answer": 3, "explain": "光学显微镜有目镜、物镜、调节旋钮、载物台、反光镜等。", "tag": "u1l4"}, {"id": "u1l4-02", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "judge", "q": "光学显微镜由透镜组合而成，能把图像放大一两千倍。", "answer": true, "explain": "光学显微镜可放大约一两千倍。", "tag": "u1l4"}, {"id": "u1l4-03", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "choice", "q": "光学显微镜使用步骤的正确顺序是？", "options": ["调焦→装片→对光→安放→观察", "安放→对光→装片→调焦→观察记录", "装片→安放→观察→对光→调焦", "对光→观察→安放→装片→调焦"], "answer": 1, "explain": "安放→对光→装片→调焦→观察记录。", "tag": "u1l4"}, {"id": "u1l4-04", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "choice", "q": "显微镜放大倍数的计算方法是？", "options": ["目镜+物镜", "目镜−物镜", "目镜×物镜", "只用物镜"], "answer": 2, "explain": "放大倍数=目镜倍数×物镜倍数。", "tag": "u1l4"}, {"id": "u1l4-05", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "judge", "q": "显微镜下蝴蝶翅膀其实由许多排列规则的小鳞片组成。", "answer": true, "explain": "彩色翅膀由许多小鳞片组成。", "tag": "u1l4"}, {"id": "u1l4-06", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "judge", "q": "科学素描和美术素描一样，主要表达作者情感喜好。", "answer": false, "explain": "科学素描强调客观反映事物本质属性。", "tag": "u1l4"}, {"id": "u1l4-07", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "choice", "q": "与手持式简易显微镜相比，光学显微镜通常？", "options": ["放大倍数更小、视野更大、细节更少", "放大倍数更大、视野更小、细节更多", "完全一样", "不能看细节"], "answer": 1, "explain": "光学显微镜放大更大、视野更小、细节更多。", "tag": "u1l4"}, {"id": "u1l4-08", "unitKey": "u1", "unit": "第一单元 · 用光学显微镜观察", "type": "judge", "q": "蛛丝很细且表面有黏液，有助于捕获猎物。", "answer": true, "explain": "细不易被发现，黏液利于捕食。", "tag": "u1l4"}, {"id": "u1l5-01", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "choice", "q": "1665年谁命名了“细胞”？", "options": ["列文虎克", "罗伯特·胡克", "伽利略", "惠更斯"], "answer": 1, "explain": "英国科学家罗伯特·胡克观察软木薄片后命名为细胞。", "tag": "u1l5"}, {"id": "u1l5-02", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "choice", "q": "洋葱表皮细胞中间的小黑点通常是？", "options": ["液泡", "细胞核", "细胞膜", "细胞壁"], "answer": 1, "explain": "小黑点是细胞核，大泡泡是液泡。", "tag": "u1l5"}, {"id": "u1l5-03", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "洋葱表皮细胞形状大致为长方形，排列较紧密。", "answer": true, "explain": "大体长方形，排列紧密。", "tag": "u1l5"}, {"id": "u1l5-04", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "细胞是生物体基本的结构和功能单位。", "answer": true, "explain": "这是细胞的基本科学观念。", "tag": "u1l5"}, {"id": "u1l5-05", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "不同生物、同一生物不同组织的细胞形态可以不同，并与功能相对应。", "answer": true, "explain": "细胞形态多样，形态与功能相对应。", "tag": "u1l5"}, {"id": "u1l5-06", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "许多科学家发现植物、血液、低等动物等都具有细胞结构。", "answer": true, "explain": "细胞结构普遍存在于这些生物中。", "tag": "u1l5"}, {"id": "u1l5-07", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "非生物也有细胞结构。", "answer": false, "explain": "非生物没有细胞结构，看到的是物质颗粒。", "tag": "u1l5"}, {"id": "u1l5-08", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "choice", "q": "下列哪项是单细胞生物？", "options": ["老虎", "草履虫", "蘑菇菌盖整体", "大树"], "answer": 1, "explain": "草履虫、变形虫、喇叭虫、眼虫、太阳虫等是单细胞生物。", "tag": "u1l5"}, {"id": "u1l5-09", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "choice", "q": "动植物细胞都具有的基本结构是？", "options": ["细胞壁和叶绿体", "细胞膜、细胞质、细胞核", "只有液泡", "只有细胞壁"], "answer": 1, "explain": "基本结构大致相同：细胞膜、细胞质、细胞核。", "tag": "u1l5"}, {"id": "u1l5-10", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "生物微观结构高度有序且有动态变化，非生物微观结构较静止。", "answer": true, "explain": "这是生物与非生物在微观结构上的区别之一。", "tag": "u1l5"}, {"id": "u1l5-11", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "显微镜所成的像与实物上下、左右颠倒。", "answer": true, "explain": "显微镜成像上下左右颠倒。", "tag": "u1l5"}, {"id": "u1l5-12", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "choice", "q": "制作洋葱表皮玻片时滴碘酒的主要目的是？", "options": ["增加水分", "让细胞染色便于观察", "杀死所有细胞器", "代替盖玻片"], "answer": 1, "explain": "碘酒染色，便于观察细胞。", "tag": "u1l5"}, {"id": "u1l5-13", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "盖盖玻片时应一边先接触水滴再轻轻盖上，避免出现气泡。", "answer": true, "explain": "这样可避免气泡影响观察。", "tag": "u1l5"}, {"id": "u1l5-14", "unitKey": "u1", "unit": "第一单元 · 观察细胞", "type": "judge", "q": "观察记录时左眼看目镜，右眼可睁开方便画图。", "answer": true, "explain": "这是显微镜观察记录的常用方法。", "tag": "u1l5"}, {"id": "u1l6-01", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "judge", "q": "河水含有大量微小生物，不可以直接喝。", "answer": true, "explain": "可能含致病微生物，不能直接饮用。", "tag": "u1l6"}, {"id": "u1l6-02", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "judge", "q": "野外考察要在成人陪同下进行。", "answer": true, "explain": "这是安全要求。", "tag": "u1l6"}, {"id": "u1l6-03", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "choice", "q": "玻片标本通常封存在哪里？", "options": ["两个物镜之间", "盖玻片与载玻片之间", "目镜里", "反光镜上"], "answer": 1, "explain": "封存在盖玻片与载玻片之间。", "tag": "u1l6"}, {"id": "u1l6-04", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "choice", "q": "电子显微镜大约可以把图像放大？", "options": ["几十倍", "一两百倍", "一两千倍", "几百万倍"], "answer": 3, "explain": "电子显微镜可放大几百万倍。", "tag": "u1l6"}, {"id": "u1l6-05", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "judge", "q": "水中微小生物也具有生物特征，如对外界刺激有反应、能繁殖等。", "answer": true, "explain": "它们对环境有需求，会运动、能繁殖等。", "tag": "u1l6"}, {"id": "u1l6-06", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "judge", "q": "池塘水中可能有喇叭虫、衣藻、草履虫、轮虫等微小生物。", "answer": true, "explain": "池塘中常有多种微小生物。", "tag": "u1l6"}, {"id": "u1l6-07", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "choice", "q": "微生物这一大类通常不包括？", "options": ["细菌和病毒", "真菌和一些藻类", "大象", "原生生物"], "answer": 2, "explain": "微生物包括细菌、病毒、真菌、古菌、原生生物和一些藻类等。", "tag": "u1l6"}, {"id": "u1l6-08", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "judge", "q": "水中观察到的微小物体并不都是生物。", "answer": true, "explain": "要根据是否具有生物特征来判断。", "tag": "u1l6"}, {"id": "u1l6-09", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "judge", "q": "空气中和土壤中也有微生物。", "answer": true, "explain": "病原体可经空气传播；土壤微生物可分解残体。", "tag": "u1l6"}, {"id": "u1l6-10", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "judge", "q": "微小生物运动太快时，可先在载玻片放少量脱脂棉再滴水观察。", "answer": true, "explain": "脱脂棉可限制其快速移动，便于观察。", "tag": "u1l6"}, {"id": "u1l6-11", "unitKey": "u1", "unit": "第一单元 · 观察水中的微小生物", "type": "choice", "q": "用显微镜观察微小生物时，一般应？", "options": ["先高倍再低倍", "先低倍再高倍", "从不调焦", "装片随意放"], "answer": 1, "explain": "先用低倍镜找到，再用高倍镜观察。", "tag": "u1l6"}, {"id": "u1l7-01", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "酵母菌能帮助生产食物，霉菌可能引起食物霉变。", "answer": true, "explain": "有些微生物有益，有些有害。", "tag": "u1l7"}, {"id": "u1l7-02", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "霉变食物对身体有害；保持干燥、低温可以防霉。", "answer": true, "explain": "干燥低温不利于霉菌生长。", "tag": "u1l7"}, {"id": "u1l7-03", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "微生物可用于处理厨余、制造堆肥、净化污水等环保用途。", "answer": true, "explain": "微生物可保护环境。", "tag": "u1l7"}, {"id": "u1l7-04", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "choice", "q": "病毒与细菌相比，通常？", "options": ["更大，肉眼可见", "更小，多数需电子显微镜才能看到", "一样大", "没有病毒这种生物"], "answer": 1, "explain": "病毒更小，直径约10～300纳米，需电子显微镜。", "tag": "u1l7"}, {"id": "u1l7-05", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "病毒有细胞结构，能独立生活。", "answer": false, "explain": "病毒无细胞结构，必须寄生在活细胞内。", "tag": "u1l7"}, {"id": "u1l7-06", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "见到“当心感染”标志要尽量远离或注意防护。", "answer": true, "explain": "医院传染病区等处常见此标志。", "tag": "u1l7"}, {"id": "u1l7-07", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "疫苗对预防、控制传染病有巨大作用。", "answer": true, "explain": "利用特殊微生物及其代谢产物制成疫苗。", "tag": "u1l7"}, {"id": "u1l7-08", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "蘑菇、木耳、灵芝是生活中可以直接看到的微生物。", "answer": true, "explain": "绝大多数微生物很细小，但这几种可直接看到。", "tag": "u1l7"}, {"id": "u1l7-09", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "choice", "q": "预防传染病较合理的做法不包括？", "options": ["勤洗手、清洁消毒", "接种疫苗", "从不开窗、从不运动", "均衡饮食提高免疫力"], "answer": 2, "explain": "应勤洗手、消毒、均衡饮食运动、按程序接种疫苗。", "tag": "u1l7"}, {"id": "u1l7-10", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "judge", "q": "分餐、使用公筷可降低病原微生物经共同进餐传播的概率。", "answer": true, "explain": "减少交叉传播。", "tag": "u1l7"}, {"id": "u1l7-11", "unitKey": "u1", "unit": "第一单元 · 微生物与人类", "type": "choice", "q": "餐具较适合的消毒方法是？", "options": ["随便用含氯消毒液残留不管", "煮沸消毒法或紫外线消毒法", "只擦一擦即可", "用脏水冲洗"], "answer": 1, "explain": "煮沸、紫外线无化学残留，更适合餐具。", "tag": "u1l7"}, {"id": "u2l1-01", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "judge", "q": "完成活动所用的器具都可称为工具，一般能省力或更便捷。", "answer": true, "explain": "铅笔、剪刀、自行车、手机等都是工具。", "tag": "u2l1"}, {"id": "u2l1-02", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "choice", "q": "书写工具发展大致顺序更合理的是？", "options": ["签字笔→钢笔→毛笔", "毛笔→钢笔→签字笔", "钢笔→毛笔→签字笔", "都同时出现无发展"], "answer": 1, "explain": "从毛笔到钢笔再到签字笔，使用更方便。", "tag": "u2l1"}, {"id": "u2l1-03", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "choice", "q": "运输工具发展顺序是？", "options": ["厢式货车→独轮车→扁担→背篓", "背篓→扁担→独轮车→厢式货车", "扁担→背篓→货车→独轮车", "独轮车→背篓→扁担→货车"], "answer": 1, "explain": "背篓→扁担→独轮车→厢式货车。", "tag": "u2l1"}, {"id": "u2l1-04", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "judge", "q": "用手推车运课本既省力，又能运更多书。", "answer": true, "explain": "手推车提高了运输效率。", "tag": "u2l1"}, {"id": "u2l1-05", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "choice", "q": "独轮车中承受整车和货物重量、帮助省力的关键是？", "options": ["扶手", "车轮", "车身装饰", "铃铛"], "answer": 1, "explain": "车轮滚动前进并承重，是省力关键。", "tag": "u2l1"}, {"id": "u2l1-06", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "choice", "q": "独轮车车身的主要作用是？", "options": ["提供动力", "装载和容纳货物", "只做装饰", "改变方向盘"], "answer": 1, "explain": "车身用于装载货物。", "tag": "u2l1"}, {"id": "u2l1-07", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "choice", "q": "独轮车扶手的作用是？", "options": ["只支撑停车", "握住并推动以提供前进动力", "代替车轮", "装货"], "answer": 1, "explain": "人通过扶手提供前进动力。", "tag": "u2l1"}, {"id": "u2l1-08", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "choice", "q": "独轮车支架的作用是？", "options": ["只装饰", "支撑车身并连接各部分", "产生动力", "放大图像"], "answer": 1, "explain": "支架支撑并连接各部分。", "tag": "u2l1"}, {"id": "u2l1-09", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "choice", "q": "背篓更适合的场景是？", "options": ["公路大量中长途运输", "崎岖地形下的少量运输", "只适合海上", "只能运汽车"], "answer": 1, "explain": "背篓灵活，适于崎岖地形微量运输。", "tag": "u2l1"}, {"id": "u2l1-10", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "judge", "q": "手推车可装更多货、更省力，但主要适合较平坦路况。", "answer": true, "explain": "优点是省力高效，缺点是路况要求较高。", "tag": "u2l1"}, {"id": "u2l1-11", "unitKey": "u2", "unit": "第二单元 · 各种各样的工具", "type": "judge", "q": "扁担结构简单，但不够稳定、易折断。", "answer": true, "explain": "扁担适合中等重量，但不稳定易折断。", "tag": "u2l1"}, {"id": "u2l2-01", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "judge", "q": "独轮车省力是因为运用了杠杆技术。", "answer": true, "explain": "独轮车是杠杆原理的应用。", "tag": "u2l2"}, {"id": "u2l2-02", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "choice", "q": "棍子下垫支撑物撬起重物，这种工具叫？", "options": ["滑轮", "撬杠（杠杆类工具）", "斜面", "轮轴"], "answer": 1, "explain": "撬杠是一种杠杆类工具。", "tag": "u2l2"}, {"id": "u2l2-03", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "choice", "q": "杠杆三个重要位置是？", "options": ["起点、中点、终点", "支点、用力点、阻力点", "轮、轴、绳", "上、中、下"], "answer": 1, "explain": "支点、用力点、阻力点。", "tag": "u2l2"}, {"id": "u2l2-04", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "choice", "q": "支点的含义是？", "options": ["人用力的位置", "支撑杠杆并能绕其转动的固定点", "阻碍转动的位置", "货物本身"], "answer": 1, "explain": "支点是支撑并作为转动固定点。", "tag": "u2l2"}, {"id": "u2l2-05", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "choice", "q": "下列属于“省力费距离”的是？", "options": ["筷子、钓鱼竿", "撬棍、启瓶器、羊角锤", "全部费力", "都不是杠杆"], "answer": 1, "explain": "撬棍、启瓶器、钳子、羊角锤等省力费距离。", "tag": "u2l2"}, {"id": "u2l2-06", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "choice", "q": "下列属于“费力省距离”的是？", "options": ["羊角锤", "打捞网、筷子、船桨、钓鱼竿", "启瓶器", "撬棍"], "answer": 1, "explain": "这类工具扩展力的作用范围（省距离）。", "tag": "u2l2"}, {"id": "u2l2-07", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "judge", "q": "杆秤、跷跷板可能省力也可能费力。", "answer": true, "explain": "它们属于可能省力也可能费力的杠杆。", "tag": "u2l2"}, {"id": "u2l2-08", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "judge", "q": "人体中肘关节是支点，肱二头肌提供动力。", "answer": true, "explain": "手臂提物可看作人体杠杆。", "tag": "u2l2"}, {"id": "u2l2-09", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "judge", "q": "支点和阻力点距离不变时，用力点离支点越远越省力。", "answer": true, "explain": "动力臂越长越省力。", "tag": "u2l2"}, {"id": "u2l2-10", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "judge", "q": "用力点与支点距离差不多时，阻力点离支点越近越省力。", "answer": true, "explain": "阻力臂越短越省力。", "tag": "u2l2"}, {"id": "u2l2-11", "unitKey": "u2", "unit": "第二单元 · 独轮车省力的秘密", "type": "judge", "q": "抬起独轮车时，用力点到支点距离大于阻力点到支点距离，所以省力。", "answer": true, "explain": "这是独轮车作为省力杠杆的原因。", "tag": "u2l2"}, {"id": "u2l3-01", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "judge", "q": "可根据需求对独轮车的车身、扶手、轮子做不同设计。", "answer": true, "explain": "结构简单，可按需求设计。", "tag": "u2l3"}, {"id": "u2l3-02", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "judge", "q": "用热熔枪时要注意安全，防止烫伤。", "answer": true, "explain": "组装时要注意黏合牢固与安全。", "tag": "u2l3"}, {"id": "u2l3-03", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "choice", "q": "轮子发展历程是？", "options": ["充气轮胎→辐条轮→木板圆轮", "圆形的板→带辐条的轮子→充气轮胎", "只有现代轮胎", "没有发展"], "answer": 1, "explain": "圆形板→辐条轮→充气轮胎。", "tag": "u2l3"}, {"id": "u2l3-04", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "judge", "q": "多层粘贴可增加模型轮子的强度和稳定性。", "answer": true, "explain": "如5层硬纸板粘贴可增强轮子。", "tag": "u2l3"}, {"id": "u2l3-05", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "judge", "q": "橡皮圈能增加轮子与地面摩擦力，防止打滑。", "answer": true, "explain": "可提高抓地防滑效果。", "tag": "u2l3"}, {"id": "u2l3-06", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "choice", "q": "独轮车容易偏倒、重心不稳，较合理的改进是？", "options": ["去掉轮子", "在车斗底部增加配重", "把扶手拆掉", "永不测试"], "answer": 1, "explain": "底部配重可提升稳定性。", "tag": "u2l3"}, {"id": "u2l3-07", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "choice", "q": "车轮转动不灵活时可以？", "options": ["加大摩擦", "在车轴涂少量润滑油", "把轴焊死", "去掉车轮"], "answer": 1, "explain": "润滑可减小摩擦。", "tag": "u2l3"}, {"id": "u2l3-08", "unitKey": "u2", "unit": "第二单元 · 制作独轮车", "type": "judge", "q": "不使用时独轮车易倾倒，可安装支架改进。", "answer": true, "explain": "支架可支撑停放。", "tag": "u2l3"}, {"id": "u2l4-01", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "choice", "q": "斜面是指？", "options": ["任何曲面", "与水平面成一定夹角的平面", "竖直墙面", "圆轮"], "answer": 1, "explain": "斜面是与水平面成夹角的平面，属于简单机械。", "tag": "u2l4"}, {"id": "u2l4-02", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "judge", "q": "斜面可省力，但通常会费距离。", "answer": true, "explain": "克服垂直提升困难时省力费距离。", "tag": "u2l4"}, {"id": "u2l4-03", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "judge", "q": "利用斜面滑道从上往下运送物体会省力，甚至可不施力。", "answer": true, "explain": "向下运送时可借助重力。", "tag": "u2l4"}, {"id": "u2l4-04", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "judge", "q": "高度一定时，斜面越长、坡度越缓，越省力，但路程更长。", "answer": true, "explain": "缓坡更省力，距离更长。", "tag": "u2l4"}, {"id": "u2l4-05", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "judge", "q": "大桥引桥、无障碍坡道、螺丝钉螺纹、盘山公路都利用了斜面。", "answer": true, "explain": "生活中多处用到斜面。", "tag": "u2l4"}, {"id": "u2l4-06", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "judge", "q": "手推车装货时抬高扶手、倾斜车身，也利用了斜面。", "answer": true, "explain": "倾斜车身形成斜面便于装货。", "tag": "u2l4"}, {"id": "u2l4-07", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "judge", "q": "实验表明：用斜面提升物体比直接向上提升更省力。", "answer": true, "explain": "斜面提升时橡皮筋伸长更短，说明更省力。", "tag": "u2l4"}, {"id": "u2l4-08", "unitKey": "u2", "unit": "第二单元 · 巧用斜面", "type": "judge", "q": "坡度较陡的斜面比缓坡省力更多。", "answer": false, "explain": "缓坡省力较多但距离长；陡坡省力较少但距离短。", "tag": "u2l4"}, {"id": "u2l5-01", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "choice", "q": "边缘有凹槽、可绕中心轴转动的轮子叫？", "options": ["杠杆", "滑轮", "斜面", "圭表"], "answer": 1, "explain": "这就是滑轮的定义。", "tag": "u2l5"}, {"id": "u2l5-02", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "choice", "q": "旗杆顶部那种固定位置转动、不移动的滑轮叫？", "options": ["动滑轮", "定滑轮", "滑轮组", "轮轴"], "answer": 1, "explain": "固定不移动的是定滑轮。", "tag": "u2l5"}, {"id": "u2l5-03", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "choice", "q": "塔吊吊钩那种可随重物移动的滑轮叫？", "options": ["定滑轮", "动滑轮", "日晷", "斜面"], "answer": 1, "explain": "随重物移动的是动滑轮。", "tag": "u2l5"}, {"id": "u2l5-04", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "judge", "q": "定滑轮能改变用力方向，但不改变用力大小。", "answer": true, "explain": "用定滑轮时拉力约等于重力。", "tag": "u2l5"}, {"id": "u2l5-05", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "judge", "q": "动滑轮能省力，一般也能改变用力方向。", "answer": false, "explain": "动滑轮能改变力的大小，但不改变方向。", "tag": "u2l5"}, {"id": "u2l5-06", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "judge", "q": "一般情况下，用动滑轮提升时拉力约等于物与滑轮总重的一半。", "answer": true, "explain": "这是动滑轮省力的常见规律。", "tag": "u2l5"}, {"id": "u2l5-07", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "judge", "q": "滑轮组由定滑轮和动滑轮组合，既可改变力的大小又可改变方向。", "answer": true, "explain": "滑轮组兼具两者优点。", "tag": "u2l5"}, {"id": "u2l5-08", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "judge", "q": "起重机、消防车、电梯等常组合使用多个滑轮。", "answer": true, "explain": "生活中常见滑轮组合应用。", "tag": "u2l5"}, {"id": "u2l5-09", "unitKey": "u2", "unit": "第二单元 · 妙用滑轮", "type": "choice", "q": "下列属于定滑轮应用的是？", "options": ["塔吊吊钩本身", "旗杆升降装置、百叶窗拉绳", "只用筷子", "圭表"], "answer": 1, "explain": "旗杆、百叶窗拉绳等是定滑轮应用。", "tag": "u2l5"}, {"id": "u2l6-01", "unitKey": "u2", "unit": "第二单元 · 给小车安装方向盘", "type": "choice", "q": "较大的轮和较小的轴固定一起转动的机械叫？", "options": ["斜面", "轮轴", "动滑轮", "杠杆支点"], "answer": 1, "explain": "这是轮轴的定义。", "tag": "u2l6"}, {"id": "u2l6-02", "unitKey": "u2", "unit": "第二单元 · 给小车安装方向盘", "type": "judge", "q": "汽车方向盘、水龙头、螺丝刀等都是轮轴应用。", "answer": true, "explain": "生活中轮轴应用很广。", "tag": "u2l6"}, {"id": "u2l6-03", "unitKey": "u2", "unit": "第二单元 · 给小车安装方向盘", "type": "judge", "q": "使用轮轴时在轮上用力更省力；轴不变时轮越大越省力。", "answer": true, "explain": "轮越大，动力臂越长越省力。", "tag": "u2l6"}, {"id": "u2l6-04", "unitKey": "u2", "unit": "第二单元 · 给小车安装方向盘", "type": "judge", "q": "轮轴是一种变形的杠杆。", "answer": true, "explain": "用轮带轴转时通常省力；用轴带轮转时费力。", "tag": "u2l6"}, {"id": "u2l6-05", "unitKey": "u2", "unit": "第二单元 · 给小车安装方向盘", "type": "judge", "q": "用轴带动轮转动时，一般更省力。", "answer": false, "explain": "用轴带轮时，动力臂更短，一般费力。", "tag": "u2l6"}, {"id": "u2l6-06", "unitKey": "u2", "unit": "第二单元 · 给小车安装方向盘", "type": "judge", "q": "独轮车不需要方向盘，因为车把手可以控制方向（把手为轮、独轮为轴）。", "answer": true, "explain": "把手本身就是轮轴式转向。", "tag": "u2l6"}, {"id": "u2l6-07", "unitKey": "u2", "unit": "第二单元 · 给小车安装方向盘", "type": "judge", "q": "轮更大、转动半径更大的转向装置通常更稳，但灵活性可能较低。", "answer": true, "explain": "大轮稳定性高、灵活性相对低。", "tag": "u2l6"}, {"id": "u2l7-01", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "judge", "q": "工具的演化是人类文明进步的重要标志。", "answer": true, "explain": "工具发展反映文明进步。", "tag": "u2l7"}, {"id": "u2l7-02", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "choice", "q": "运输工具动力技术发展大致是？", "options": ["电力→燃油→蒸汽→人力", "人力→畜力→蒸汽→燃油→电力", "只有人力", "没有变化"], "answer": 1, "explain": "动力技术不断升级。", "tag": "u2l7"}, {"id": "u2l7-03", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "choice", "q": "印刷术发展过程是？", "options": ["激光→活字→雕版", "雕版印刷→活字印刷→激光印刷", "只有复印", "活字→雕版→石刻"], "answer": 1, "explain": "雕版→活字→激光印刷。", "tag": "u2l7"}, {"id": "u2l7-04", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "choice", "q": "我国古代四大发明是？", "options": ["电脑、手机、高铁、火箭", "指南针、造纸术、火药、印刷术", "杠杆、斜面、滑轮、轮轴", "日晷、水钟、沙漏、摆钟"], "answer": 1, "explain": "四大发明：指南针、造纸术、火药、印刷术。", "tag": "u2l7"}, {"id": "u2l7-05", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "judge", "q": "任何技术背后都有科学原理，如杠杆技术对应杠杆原理。", "answer": true, "explain": "科学原理支撑技术应用。", "tag": "u2l7"}, {"id": "u2l7-06", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "judge", "q": "工具是具体实物，技术是经验、技巧和方法；二者相互促进。", "answer": true, "explain": "工具与技术相互促进并推动社会发展。", "tag": "u2l7"}, {"id": "u2l7-07", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "judge", "q": "同一种技术可以应用在不同工具上，如杠杆用于剪刀、筷子等。", "answer": true, "explain": "一种技术可跨工具应用。", "tag": "u2l7"}, {"id": "u2l7-08", "unitKey": "u2", "unit": "第二单元 · 社会发展与工具和技术", "type": "judge", "q": "中国空间站应用了航天自动控制、空间电源与储能等多种技术。", "answer": true, "explain": "空间站综合应用多项技术。", "tag": "u2l7"}, {"id": "u3l1-01", "unitKey": "u3", "unit": "第三单元 · 利用地球模型来研究", "type": "judge", "q": "因为地球太大，科学家常用地球模型（如地球仪）来研究。", "answer": true, "explain": "模型是研究地球的重要工具。", "tag": "u3l1"}, {"id": "u3l1-02", "unitKey": "u3", "unit": "第三单元 · 利用地球模型来研究", "type": "judge", "q": "赤道把地球分为南北半球。", "answer": true, "explain": "赤道分南北半球。", "tag": "u3l1"}, {"id": "u3l1-03", "unitKey": "u3", "unit": "第三单元 · 利用地球模型来研究", "type": "judge", "q": "地球仪上的地轴总是有点倾斜。", "answer": true, "explain": "地轴是倾斜的。", "tag": "u3l1"}, {"id": "u3l1-04", "unitKey": "u3", "unit": "第三单元 · 利用地球模型来研究", "type": "choice", "q": "与赤道平行、指示东西方向的是？", "options": ["经线", "纬线", "地轴", "赤道以外任意直线"], "answer": 1, "explain": "纬线指示东西方向。", "tag": "u3l1"}, {"id": "u3l1-05", "unitKey": "u3", "unit": "第三单元 · 利用地球模型来研究", "type": "choice", "q": "连接南北两极、指示南北方向的是？", "options": ["纬线", "经线", "赤道", "回归线以外任意圆"], "answer": 1, "explain": "经线指示南北方向。", "tag": "u3l1"}, {"id": "u3l1-06", "unitKey": "u3", "unit": "第三单元 · 利用地球模型来研究", "type": "judge", "q": "地球模型有多种类型，用途不同。", "answer": true, "explain": "如结构剖面、海陆分布、自转模型等。", "tag": "u3l1"}, {"id": "u3l2-01", "unitKey": "u3", "unit": "第三单元 · 昼夜交替的解释", "type": "judge", "q": "地球不透明，太阳一次大约只照亮地球表面一半。", "answer": true, "explain": "照到的是白昼，没照到的是黑夜。", "tag": "u3l2"}, {"id": "u3l2-02", "unitKey": "u3", "unit": "第三单元 · 昼夜交替的解释", "type": "judge", "q": "昼夜交替与地球和太阳的相对运动有关，一昼夜约24小时。", "answer": true, "explain": "相对运动导致昼夜交替。", "tag": "u3l2"}, {"id": "u3l2-03", "unitKey": "u3", "unit": "第三单元 · 昼夜交替的解释", "type": "choice", "q": "“地心说”认为？", "options": ["太阳在宇宙中心", "地球在宇宙中心且静止", "月亮在宇宙中心", "没有中心"], "answer": 1, "explain": "地心说：地球居中且静止。", "tag": "u3l2"}, {"id": "u3l2-04", "unitKey": "u3", "unit": "第三单元 · 昼夜交替的解释", "type": "choice", "q": "“日心说”认为？", "options": ["地球居中", "太阳居中且天体绕太阳运动", "火星居中", "地球不运动也无公转"], "answer": 1, "explain": "日心说：太阳居中。", "tag": "u3l2"}, {"id": "u3l2-05", "unitKey": "u3", "unit": "第三单元 · 昼夜交替的解释", "type": "choice", "q": "现在科学家对昼夜交替的解释是？", "options": ["只有太阳绕地球", "地球公转同时自转", "地球完全不动", "只有公转无自转"], "answer": 1, "explain": "公转同时自转。", "tag": "u3l2"}, {"id": "u3l2-06", "unitKey": "u3", "unit": "第三单元 · 昼夜交替的解释", "type": "judge", "q": "模拟实验中，地球模型代表地球，手电筒代表太阳。", "answer": true, "explain": "这是常用模拟方法。", "tag": "u3l2"}, {"id": "u3l2-07", "unitKey": "u3", "unit": "第三单元 · 昼夜交替的解释", "type": "judge", "q": "对自然现象可能有多种解释，需要更多证据才能更接近真实。", "answer": true, "explain": "证据越多，解释越合理。", "tag": "u3l2"}, {"id": "u3l3-01", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "choice", "q": "像陀螺那样绕自身轴旋转的运动叫？", "options": ["公转", "自转", "平移", "振动"], "answer": 1, "explain": "绕自转轴旋转叫自转。", "tag": "u3l3"}, {"id": "u3l3-02", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "judge", "q": "地球围绕地轴自转。", "answer": true, "explain": "地球是球体，绕地轴自转。", "tag": "u3l3"}, {"id": "u3l3-03", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "choice", "q": "地轴倾斜角度大约是？", "options": ["0°", "12.5°", "23.5°", "90°"], "answer": 2, "explain": "约23.5°，对地球环境很重要。", "tag": "u3l3"}, {"id": "u3l3-04", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "judge", "q": "八颗行星都在自转，但自转轴倾斜角度差异较大。", "answer": true, "explain": "各行星倾角不同。", "tag": "u3l3"}, {"id": "u3l3-05", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "judge", "q": "天王星自转轴平躺且指向太阳时，基本不会出现昼夜交替。", "answer": true, "explain": "这种姿态下自转也不产生昼夜交替。", "tag": "u3l3"}, {"id": "u3l3-06", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "judge", "q": "地球自转一定会产生昼夜交替。", "answer": false, "explain": "地轴平躺指向太阳时，即使自转也不产生昼夜交替。", "tag": "u3l3"}, {"id": "u3l3-07", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "judge", "q": "陀螺自转轴常竖直，地球自转轴是倾斜的。", "answer": true, "explain": "相同点是绕轴转，不同点是轴的姿态。", "tag": "u3l3"}, {"id": "u3l3-08", "unitKey": "u3", "unit": "第三单元 · 地球如何自转", "type": "judge", "q": "地球自转特点：地轴始终倾斜且倾角基本不变，周期约24小时。", "answer": true, "explain": "这是地球自转的基本特点。", "tag": "u3l3"}, {"id": "u3l4-01", "unitKey": "u3", "unit": "第三单元 · 哪里先迎来黎明", "type": "choice", "q": "地球自转方向是？", "options": ["自东向西", "自西向东", "由南向北", "无固定方向"], "answer": 1, "explain": "自西向东自转。", "tag": "u3l4"}, {"id": "u3l4-02", "unitKey": "u3", "unit": "第三单元 · 哪里先迎来黎明", "type": "judge", "q": "我们看到太阳东升西落，是地球自转相对运动的结果。", "answer": true, "explain": "相对运动导致东升西落。", "tag": "u3l4"}, {"id": "u3l4-03", "unitKey": "u3", "unit": "第三单元 · 哪里先迎来黎明", "type": "judge", "q": "北京在乌鲁木齐东边，所以北京先迎来黎明。", "answer": true, "explain": "东边先迎来黎明，也先进入黑夜。", "tag": "u3l4"}, {"id": "u3l4-04", "unitKey": "u3", "unit": "第三单元 · 哪里先迎来黎明", "type": "judge", "q": "若地球自东向西转，则西边会先迎来黎明。", "answer": true, "explain": "自转方向决定哪里先迎来黎明。", "tag": "u3l4"}, {"id": "u3l4-05", "unitKey": "u3", "unit": "第三单元 · 哪里先迎来黎明", "type": "judge", "q": "地球自转一周的时间是24小时。", "answer": true, "explain": "自转周期为一天。", "tag": "u3l4"}, {"id": "u3l5-01", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "日影变化与太阳在天空中的位置变化有关。", "answer": true, "explain": "太阳位置变化导致影长变化。", "tag": "u3l5"}, {"id": "u3l5-02", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "choice", "q": "中国古代测正午日影长度的仪器是？", "options": ["日晷", "圭表", "水钟", "摆钟"], "answer": 1, "explain": "圭表由圭和表组成，测正午影长。", "tag": "u3l5"}, {"id": "u3l5-03", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "根据正午圭表影长，可以确定四季变化。", "answer": true, "explain": "影长有规律变化，可定四季。", "tag": "u3l5"}, {"id": "u3l5-04", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "choice", "q": "同一地点正午影长最短一般在？", "options": ["春分", "夏至", "秋分", "冬至"], "answer": 1, "explain": "夏至影最短，冬至影最长。", "tag": "u3l5"}, {"id": "u3l5-05", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "choice", "q": "同一地点正午影长最长一般在？", "options": ["夏至", "冬至", "春分", "秋分"], "answer": 1, "explain": "冬至正午太阳最低，影最长。", "tag": "u3l5"}, {"id": "u3l5-06", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "夏至到冬至，正午影长逐渐变长；冬至到夏至逐渐变短。", "answer": true, "explain": "影长随季节有规律变化。", "tag": "u3l5"}, {"id": "u3l5-07", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "春分与秋分，同一地点正午影长一样长。", "answer": true, "explain": "春秋分影长相同。", "tag": "u3l5"}, {"id": "u3l5-08", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "连续两次正午影长最短（或最长）的时间间隔是一年。", "answer": true, "explain": "可据此认识年的长度。", "tag": "u3l5"}, {"id": "u3l5-09", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "同一地点夏至昼最长夜最短，冬至夜最长昼最短。", "answer": true, "explain": "春秋分昼夜平分。", "tag": "u3l5"}, {"id": "u3l5-10", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "夏至正午太阳高度角最大，日出早、日落晚。", "answer": true, "explain": "冬至则相反：高度角最小，日出晚、日落早。", "tag": "u3l5"}, {"id": "u3l5-11", "unitKey": "u3", "unit": "第三单元 · 影长的四季变化", "type": "judge", "q": "测影长也可以不在正午，但地点和时间要固定，并选晴天。", "answer": true, "explain": "关键是条件固定、阳光清晰。", "tag": "u3l5"}, {"id": "u3l6-01", "unitKey": "u3", "unit": "第三单元 · 地球的公转", "type": "judge", "q": "类比是常见思维方法，但要恰当使用。", "answer": true, "explain": "恰当类比能更科学地解释现象。", "tag": "u3l6"}, {"id": "u3l6-02", "unitKey": "u3", "unit": "第三单元 · 地球的公转", "type": "choice", "q": "地球公转是指？", "options": ["地球绕地轴转", "地球围绕太阳转动", "太阳绕地球转", "月亮绕太阳转"], "answer": 1, "explain": "公转：一个天体围绕另一个天体转动。", "tag": "u3l6"}, {"id": "u3l6-03", "unitKey": "u3", "unit": "第三单元 · 地球的公转", "type": "judge", "q": "地球公转方向是自西向东，周期约一年。", "answer": true, "explain": "公转方向自西向东，周期一年。", "tag": "u3l6"}, {"id": "u3l6-04", "unitKey": "u3", "unit": "第三单元 · 地球的公转", "type": "judge", "q": "地球公转时地轴倾斜方向和角度不变，始终指向北极星附近。", "answer": true, "explain": "地轴指向保持稳定。", "tag": "u3l6"}, {"id": "u3l6-05", "unitKey": "u3", "unit": "第三单元 · 地球的公转", "type": "judge", "q": "地球公转轨道是椭圆形；一月离太阳最近，七月最远。", "answer": true, "explain": "近日点约在一月，远日点约在七月。", "tag": "u3l6"}, {"id": "u3l6-06", "unitKey": "u3", "unit": "第三单元 · 地球的公转", "type": "judge", "q": "北半球与南半球季节相反。", "answer": true, "explain": "南北半球季节相反。", "tag": "u3l6"}, {"id": "u3l6-07", "unitKey": "u3", "unit": "第三单元 · 地球的公转", "type": "judge", "q": "太阳系中，离太阳越近的行星公转周期越短。", "answer": true, "explain": "距离越远周期越长。", "tag": "u3l6"}, {"id": "u3l7-01", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "judge", "q": "北半球四季最明显的现象之一是夏热冬冷。", "answer": true, "explain": "这是北半球常见感受。", "tag": "u3l7"}, {"id": "u3l7-02", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "judge", "q": "接收太阳光能量多少是影响地表冷热分布的重要原因。", "answer": true, "explain": "太阳高度变化影响温度。", "tag": "u3l7"}, {"id": "u3l7-03", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "judge", "q": "直射时侯光斑小、影短，同样面积获能更多，温度更高。", "answer": true, "explain": "斜射则光斑大、影长、温度较低。", "tag": "u3l7"}, {"id": "u3l7-04", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "choice", "q": "北半球夏天热冬天冷的主要原因是？", "options": ["夏天地球离太阳更近", "地轴倾斜导致太阳高度和获热不同", "太阳夏天本身更热", "没有原因"], "answer": 1, "explain": "不是因为夏天离太阳更近，而是地轴倾斜。", "tag": "u3l7"}, {"id": "u3l7-05", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "judge", "q": "二十四节气由劳动人民总结，对农业生产有指导作用。", "answer": true, "explain": "如“清明前后，种瓜点豆”等谚语。", "tag": "u3l7"}, {"id": "u3l7-06", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "judge", "q": "地球赤道周长约40000千米，人在赤道一天随自转约“坐地日行八万里”。", "answer": true, "explain": "这是对自转路程的形象说法。", "tag": "u3l7"}, {"id": "u3l7-07", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "choice", "q": "北极星属于？", "options": ["太阳系行星", "小熊座的一颗恒星", "人造卫星", "彗星"], "answer": 1, "explain": "北极星是小熊座α星，可用来辨认北方。", "tag": "u3l7"}, {"id": "u3l7-08", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "judge", "q": "地轴倾斜方向会缓慢变化，因此北极星的位置也会变化。", "answer": true, "explain": "地轴指向变化会导致“北极星”更替。", "tag": "u3l7"}, {"id": "u3l7-09", "unitKey": "u3", "unit": "第三单元 · 四季变化", "type": "judge", "q": "夏至时北半球观察点光斑较小、太阳高度大、温度高。", "answer": true, "explain": "冬至则光斑大、太阳高度小、温度低。", "tag": "u3l7"}, {"id": "u4l1-01", "unitKey": "u4", "unit": "第四单元 · 时间在流逝", "type": "judge", "q": "远古人类依靠太阳计时，昼夜交替成为“日”这一时间单位。", "answer": true, "explain": "日出而作、日落而息。", "tag": "u4l1"}, {"id": "u4l1-02", "unitKey": "u4", "unit": "第四单元 · 时间在流逝", "type": "choice", "q": "利用一天中日影方向变化来测定时刻的是？", "options": ["圭表", "日晷", "摆钟", "电子表"], "answer": 1, "explain": "日晷测时刻；圭表测影长定节气和年长。", "tag": "u4l1"}, {"id": "u4l1-03", "unitKey": "u4", "unit": "第四单元 · 时间在流逝", "type": "choice", "q": "根据日影长短测定节气和一年长短的是？", "options": ["日晷", "圭表", "沙漏", "机械摆钟"], "answer": 1, "explain": "圭表测影长。", "tag": "u4l1"}, {"id": "u4l1-04", "unitKey": "u4", "unit": "第四单元 · 时间在流逝", "type": "judge", "q": "粗细均匀的香或蜡烛，燃烧相同长度用时大致相等，故可计时。", "answer": true, "explain": "利用均匀燃烧计时。", "tag": "u4l1"}, {"id": "u4l1-05", "unitKey": "u4", "unit": "第四单元 · 时间在流逝", "type": "judge", "q": "日晷阴雨天和夜晚无法使用。", "answer": true, "explain": "日晷完全依赖阳光。", "tag": "u4l1"}, {"id": "u4l1-06", "unitKey": "u4", "unit": "第四单元 · 时间在流逝", "type": "judge", "q": "时间均匀流逝且不可逆，不会倒流。", "answer": true, "explain": "时间一直向前。", "tag": "u4l1"}, {"id": "u4l1-07", "unitKey": "u4", "unit": "第四单元 · 时间在流逝", "type": "judge", "q": "燃香上段与下段燃烧时间一定完全相同。", "answer": false, "explain": "往往不相同，会导致计时偏差。", "tag": "u4l1"}, {"id": "u4l2-01", "unitKey": "u4", "unit": "第四单元 · 用水计量时间", "type": "choice", "q": "用水计时的工具叫？", "options": ["日晷", "水钟", "圭表", "摆锤"], "answer": 1, "explain": "用水计时的工具叫水钟。", "tag": "u4l2"}, {"id": "u4l2-02", "unitKey": "u4", "unit": "第四单元 · 用水计量时间", "type": "judge", "q": "水位和孔径不变时，流出相同水量所需时间相同。", "answer": true, "explain": "人们利用水流特性计时。", "tag": "u4l2"}, {"id": "u4l2-03", "unitKey": "u4", "unit": "第四单元 · 用水计量时间", "type": "judge", "q": "瓶中水位下降时，小孔出水速度会变慢。", "answer": true, "explain": "水位降低，流速变慢。", "tag": "u4l2"}, {"id": "u4l2-04", "unitKey": "u4", "unit": "第四单元 · 用水计量时间", "type": "choice", "q": "怎样让水更均匀下流以便计时？", "options": ["让水位不断降到零", "保持水位高度基本不变", "把孔堵死", "只看一次"], "answer": 1, "explain": "保持水位稳定，流速才稳定。", "tag": "u4l2"}, {"id": "u4l2-05", "unitKey": "u4", "unit": "第四单元 · 用水计量时间", "type": "judge", "q": "输液器滚轮夹通过改变管径调节流速；滴斗可缓解液面下降引起的波动。", "answer": true, "explain": "这是生活中稳定流速的例子。", "tag": "u4l2"}, {"id": "u4l2-06", "unitKey": "u4", "unit": "第四单元 · 用水计量时间", "type": "judge", "q": "同一装置孔径不变时，滴完所有水所需时间大致相同。", "answer": true, "explain": "沙漏同理，漏完所有沙子时间固定。", "tag": "u4l2"}, {"id": "u4l2-07", "unitKey": "u4", "unit": "第四单元 · 用水计量时间", "type": "judge", "q": "四层铜壶滴漏通常比一个四倍大的单壶计时更准确，因为水位更稳定。", "answer": true, "explain": "多层结构使下级水位更稳。", "tag": "u4l2"}, {"id": "u4l3-01", "unitKey": "u4", "unit": "第四单元 · 做个水钟", "type": "choice", "q": "水钟在我国古代又叫？", "options": ["日晷", "刻漏/漏壶", "圭表", "望远镜"], "answer": 1, "explain": "又称刻漏、漏壶。", "tag": "u4l3"}, {"id": "u4l3-02", "unitKey": "u4", "unit": "第四单元 · 做个水钟", "type": "choice", "q": "记录把水漏完时间的水钟类型是？", "options": ["受水型", "泄水型", "摆钟型", "日晷型"], "answer": 1, "explain": "泄水型记录漏完的时间。", "tag": "u4l3"}, {"id": "u4l3-03", "unitKey": "u4", "unit": "第四单元 · 做个水钟", "type": "choice", "q": "在接水容器上记录装满所需时间的是？", "options": ["泄水型", "受水型", "燃香", "圭表"], "answer": 1, "explain": "受水型记录装水时间。", "tag": "u4l3"}, {"id": "u4l3-04", "unitKey": "u4", "unit": "第四单元 · 做个水钟", "type": "judge", "q": "小孔沉水碗是一种古老的受水型水钟。", "answer": true, "explain": "水从碗底小孔流入，每次下沉时间基本相同。", "tag": "u4l3"}, {"id": "u4l3-05", "unitKey": "u4", "unit": "第四单元 · 做个水钟", "type": "judge", "q": "受水型水钟0刻度在底部，越往上数值越大。", "answer": true, "explain": "泄水型则0刻度在起始水面，越往下越大。", "tag": "u4l3"}, {"id": "u4l3-06", "unitKey": "u4", "unit": "第四单元 · 做个水钟", "type": "judge", "q": "侧面吸管排走多余水，可保持水位，使滴水更均匀。", "answer": true, "explain": "这是保持匀速滴水的设计。", "tag": "u4l3"}, {"id": "u4l4-01", "unitKey": "u4", "unit": "第四单元 · 改进水钟", "type": "choice", "q": "水钟制作流程较合理的是？", "options": ["先评估再明确任务", "明确任务→制订方案→制作与测试→评估与改进", "只制作不测试", "随意组装"], "answer": 1, "explain": "按工程流程不断改进。", "tag": "u4l4"}, {"id": "u4l4-02", "unitKey": "u4", "unit": "第四单元 · 改进水钟", "type": "choice", "q": "改进水钟中溢水口的作用是？", "options": ["让水更快流光", "维持盛水漏斗液面高度不变", "装饰", "阻止计时"], "answer": 1, "explain": "溢水口维持液面，使水滴匀速。", "tag": "u4l4"}, {"id": "u4l4-03", "unitKey": "u4", "unit": "第四单元 · 改进水钟", "type": "judge", "q": "受水杯刻度不均匀时，可用细长直筒型容器改进。", "answer": true, "explain": "直筒容器刻度更均匀。", "tag": "u4l4"}, {"id": "u4l4-04", "unitKey": "u4", "unit": "第四单元 · 改进水钟", "type": "judge", "q": "除了水，还可用沙子制作计时工具，如沙漏。", "answer": true, "explain": "流动物体都可作计时介质。", "tag": "u4l4"}, {"id": "u4l4-05", "unitKey": "u4", "unit": "第四单元 · 改进水钟", "type": "judge", "q": "刻度遇水看不清，可用透明胶带贴住防水。", "answer": true, "explain": "这是常见改进措施。", "tag": "u4l4"}, {"id": "u4l5-01", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "judge", "q": "机械摆钟的出现大大提高了计时精确度。", "answer": true, "explain": "摆钟更精确。", "tag": "u4l5"}, {"id": "u4l5-02", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "judge", "q": "摆钟是根据摆的等时性制作的。", "answer": true, "explain": "等时性是摆钟原理。", "tag": "u4l5"}, {"id": "u4l5-03", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "choice", "q": "钟摆主要由哪两部分构成？", "options": ["齿轮和发条", "摆绳和摆锤", "日晷和圭表", "轮和轴"], "answer": 1, "explain": "钟摆由摆绳和摆锤构成。", "tag": "u4l5"}, {"id": "u4l5-04", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "choice", "q": "摆幅是指？", "options": ["摆锤质量", "摆的最左/最右与竖直方向的夹角", "摆绳颜色", "钟面大小"], "answer": 1, "explain": "摆幅是摆角大小。", "tag": "u4l5"}, {"id": "u4l5-05", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "judge", "q": "同一摆钟摆动一次所用时间总相等，这叫摆的等时性。", "answer": true, "explain": "往返一次记为摆动一次。", "tag": "u4l5"}, {"id": "u4l5-06", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "judge", "q": "伽利略发现：摆长固定时，周期与摆球质量无关；摆长越长周期越长。", "answer": true, "explain": "周期与质量无关，与摆长有关。", "tag": "u4l5"}, {"id": "u4l5-07", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "choice", "q": "造出世界上第一座摆钟的是？", "options": ["伽利略", "惠更斯", "胡克", "马廷英"], "answer": 1, "explain": "惠更斯完成伽利略遗愿，造出第一座摆钟。", "tag": "u4l5"}, {"id": "u4l5-08", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "judge", "q": "同一个摆在相同时间内摆动次数相同。", "answer": true, "explain": "体现等时性。", "tag": "u4l5"}, {"id": "u4l5-09", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "judge", "q": "摆在自由摆动中摆幅会变小，但快慢基本不变。", "answer": true, "explain": "摆幅变小直到停止，快慢与摆幅无关。", "tag": "u4l5"}, {"id": "u4l5-10", "unitKey": "u4", "unit": "第四单元 · 机械摆钟", "type": "judge", "q": "不同摆快慢不同，主要原因常是摆绳长度不同。", "answer": true, "explain": "摆长影响快慢。", "tag": "u4l5"}, {"id": "u4l6-01", "unitKey": "u4", "unit": "第四单元 · 制作钟摆", "type": "judge", "q": "机械摆钟里的钟摆通常每分钟摆动60次。", "answer": true, "explain": "可通过调摆长实现。", "tag": "u4l6"}, {"id": "u4l6-02", "unitKey": "u4", "unit": "第四单元 · 制作钟摆", "type": "judge", "q": "摆的快慢与摆锤质量和摆幅无关，与摆绳长度有关。", "answer": true, "explain": "绳长越长越慢，越短越快。", "tag": "u4l6"}, {"id": "u4l6-03", "unitKey": "u4", "unit": "第四单元 · 制作钟摆", "type": "judge", "q": "摆绳越长，摆动越快。", "answer": false, "explain": "摆绳越长越慢，越短越快。", "tag": "u4l6"}, {"id": "u4l6-04", "unitKey": "u4", "unit": "第四单元 · 制作钟摆", "type": "judge", "q": "可以通过不断调节摆绳长度，做成1分钟摆动60次的摆。", "answer": true, "explain": "快了加长，慢了减短。", "tag": "u4l6"}, {"id": "u4l6-05", "unitKey": "u4", "unit": "第四单元 · 制作钟摆", "type": "choice", "q": "1分钟摆动60次的钟摆，摆绳长度大约？", "options": ["2厘米", "25厘米", "2米", "25米"], "answer": 1, "explain": "大约25厘米。", "tag": "u4l6"}, {"id": "u4l6-06", "unitKey": "u4", "unit": "第四单元 · 制作钟摆", "type": "judge", "q": "为节省时间，可测15秒是否摆动15次，来判断每分是否约60次。", "answer": true, "explain": "按比例快速检验。", "tag": "u4l6"}, {"id": "u4l6-07", "unitKey": "u4", "unit": "第四单元 · 制作钟摆", "type": "judge", "q": "对比实验表明：摆绳短摆动快；摆锤质量变化对快慢几乎无影响。", "answer": true, "explain": "控制变量得出结论。", "tag": "u4l6"}, {"id": "u4l7-01", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "judge", "q": "生物活动的周期性变化会留下痕迹，如树木年轮、贝壳生长纹等。", "answer": true, "explain": "这些是“生物时钟”。", "tag": "u4l7"}, {"id": "u4l7-02", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "judge", "q": "马廷英发现珊瑚化石生长纹记载了季节生长过程。", "answer": true, "explain": "珊瑚生长纹可反映季节变化。", "tag": "u4l7"}, {"id": "u4l7-03", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "judge", "q": "古生物出现、存续和灭绝是地质时代的天然记录。", "answer": true, "explain": "化石是地质年代证据。", "tag": "u4l7"}, {"id": "u4l7-04", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "judge", "q": "从古到今一年天数逐渐减少、一天时数增加，说明地球自转在变慢。", "answer": true, "explain": "四射珊瑚化石生长线研究支持这一结论。", "tag": "u4l7"}, {"id": "u4l7-05", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "choice", "q": "确定地层绝对年代常用？", "options": ["只看颜色", "放射性同位素方法", "随便估计", "只看厚度"], "answer": 1, "explain": "绝对年代常用放射性同位素方法测定。", "tag": "u4l7"}, {"id": "u4l7-06", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "choice", "q": "测出良渚炭化稻约5000年的方法是？", "options": ["日晷", "放射性碳定年法（碳十四）", "摆的等时性", "杠杆原理"], "answer": 1, "explain": "碳十四断代法。", "tag": "u4l7"}, {"id": "u4l7-07", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "choice", "q": "下列属于生物时钟的是？", "options": ["机械摆钟", "树木年轮、珊瑚生长纹", "电子表", "水电站大坝"], "answer": 1, "explain": "生物时钟基于生长或代谢过程。", "tag": "u4l7"}, {"id": "u4l7-08", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "judge", "q": "中生代大约从2.5亿年前到6600万年前。", "answer": true, "explain": "中生代地层中的硅化木大致属于这一时期。", "tag": "u4l7"}, {"id": "u4l7-09", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "judge", "q": "若地层下部化石主要是海洋生物，该地古生代可能是海洋环境。", "answer": true, "explain": "化石组合可推测古环境。", "tag": "u4l7"}, {"id": "u4l7-10", "unitKey": "u4", "unit": "第四单元 · 时间与变化", "type": "judge", "q": "生物时钟和非生物时钟都依赖某种周期性变化，但生物时钟更易受环境影响。", "answer": true, "explain": "二者都能助测年代，特点不同。", "tag": "u4l7"}];
+
+const STORAGE_WRONG = 'science6_wrong_ids_v2';
+const JUDGE_OPTS = ['正确', '错误'];
+
+const state = {
+  queue: [],
+  index: 0,
+  correct: 0,
+  wrong: 0,
+  answered: false,
+  sessionWrong: [],
+  fromWrongPractice: false,
+  lastScreen: 'home',
+};
+
+function $(id){ return document.getElementById(id); }
+
+function loadWrongIds(){
+  try { return JSON.parse(localStorage.getItem(STORAGE_WRONG) || '[]'); }
+  catch { return []; }
+}
+function saveWrongIds(ids){
+  localStorage.setItem(STORAGE_WRONG, JSON.stringify([...new Set(ids)]));
+}
+function addWrong(q){
+  const ids = loadWrongIds();
+  if (!ids.includes(q.id)) {
+    ids.push(q.id);
+    saveWrongIds(ids);
+  }
+  if (!state.sessionWrong.find(x => x.id === q.id)) state.sessionWrong.push(q);
+}
+function removeWrongId(id){
+  saveWrongIds(loadWrongIds().filter(x => x !== id));
+}
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  $(`screen-${name}`).classList.add('active');
+}
+
+function selectedUnits(){
+  return [...document.querySelectorAll('#unitPicks input:checked')].map(i => i.value);
+}
+
+function shuffle(arr){
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz(list, fromWrong = false, sequential = true){
+  if (!list.length) {
+    alert('请至少选择一个单元，或错题本里还没有题目。');
+    return;
+  }
+  state.queue = sequential ? [...list] : shuffle(list);
+  state.index = 0;
+  state.correct = 0;
+  state.wrong = 0;
+  state.sessionWrong = [];
+  state.fromWrongPractice = fromWrong;
+  state.answered = false;
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function currentQ(){ return state.queue[state.index]; }
+
+function renderQuestion(){
+  const q = currentQ();
+  const total = state.queue.length;
+  const n = state.index + 1;
+  $('progressText').textContent = `第 ${n} / ${total} 题`;
+  $('scorePill').textContent = `正确 ${state.correct} · 错误 ${state.wrong}`;
+  $('progressBar').style.width = `${((n - 1) / total) * 100}%`;
+
+  const typeEl = $('qType');
+  if (q.type === 'choice') {
+    typeEl.textContent = '选择题';
+    typeEl.className = 'q-type choice';
+  } else {
+    typeEl.textContent = '判断题';
+    typeEl.className = 'q-type judge';
+  }
+  $('qUnit').textContent = q.unit;
+  $('qText').textContent = q.q;
+
+  const box = $('options');
+  box.innerHTML = '';
+  const opts = q.type === 'judge' ? JUDGE_OPTS : q.options;
+  opts.forEach((text, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.type = 'button';
+    btn.textContent = q.type === 'judge' ? text : `${String.fromCharCode(65 + i)}. ${text}`;
+    btn.addEventListener('click', () => answer(i));
+    box.appendChild(btn);
+  });
+
+  const exp = $('explain');
+  exp.className = 'explain';
+  exp.textContent = '';
+  $('btnNext').disabled = true;
+  $('btnNext').textContent = n === total ? '查看结果' : '下一题';
+  state.answered = false;
+}
+
+function answer(choiceIndex){
+  if (state.answered) return;
+  state.answered = true;
+  const q = currentQ();
+  const buttons = [...$('options').children];
+
+  let ok = false;
+  let correctIndex = 0;
+  if (q.type === 'judge') {
+    // 0 = 正确(true), 1 = 错误(false)
+    const userBool = choiceIndex === 0;
+    ok = userBool === q.answer;
+    correctIndex = q.answer ? 0 : 1;
+  } else {
+    ok = choiceIndex === q.answer;
+    correctIndex = q.answer;
+  }
+
+  buttons.forEach((b, i) => {
+    b.disabled = true;
+    if (i === correctIndex) b.classList.add('correct');
+    else if (i === choiceIndex && !ok) b.classList.add('wrong');
+    else b.classList.add('dim');
+  });
+
+  const exp = $('explain');
+  if (ok) {
+    state.correct++;
+    exp.className = 'explain ok show';
+    exp.innerHTML = `<strong>回答正确！</strong> ${q.explain}`;
+    if (state.fromWrongPractice) removeWrongId(q.id);
+  } else {
+    state.wrong++;
+    addWrong(q);
+    let rightText = '';
+    if (q.type === 'judge') rightText = q.answer ? '正确' : '错误';
+    else rightText = `${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}`;
+    exp.className = 'explain show';
+    exp.innerHTML = `<strong>答错了。</strong> 正确答案：${rightText}<br/>解答：${q.explain}`;
+  }
+
+  $('scorePill').textContent = `正确 ${state.correct} · 错误 ${state.wrong}`;
+  const total = state.queue.length;
+  $('progressBar').style.width = `${(state.index + 1) / total * 100}%`;
+  $('btnNext').disabled = false;
+}
+
+function nextQuestion(){
+  if (!state.answered) return;
+  if (state.index >= state.queue.length - 1) {
+    finishQuiz();
+    return;
+  }
+  state.index++;
+  renderQuestion();
+}
+
+function finishQuiz(){
+  const total = state.queue.length;
+  const rate = total ? Math.round(state.correct / total * 100) : 0;
+  $('statTotal').textContent = total;
+  $('statOk').textContent = state.correct;
+  $('statBad').textContent = state.wrong;
+  $('resultTitle').textContent = rate >= 90 ? '太棒了！' : rate >= 70 ? '掌握得不错' : '再练练更稳';
+  $('resultMsg').textContent = `正确率 ${rate}% · 本轮错题 ${state.sessionWrong.length} 道已记入错题本`;
+  showScreen('result');
+}
+
+function renderWrongBook(list){
+  const ids = list || loadWrongIds();
+  const items = ids.map(id => BANK.find(q => q.id === id)).filter(Boolean);
+  $('wrongSummary').textContent = items.length
+    ? `共 ${items.length} 道错题，答对后可从练习中自动移除。`
+    : '还没有错题，真棒！';
+  const box = $('wrongList');
+  if (!items.length) {
+    box.innerHTML = '<div class="empty panel">错题本是空的，去闯关吧～</div>';
+    return;
+  }
+  box.innerHTML = items.map(q => {
+    const ans = q.type === 'judge'
+      ? (q.answer ? '正确' : '错误')
+      : `${String.fromCharCode(65 + q.answer)}. ${q.options[q.answer]}`;
+    return `<div class="wrong-item">
+      <h4>${q.type === 'judge' ? '【判断】' : '【选择】'} ${q.q}</h4>
+      <p><span class="tag-ok">正确答案：</span>${ans}</p>
+      <p>${q.explain}</p>
+      <p style="font-size:0.8rem;opacity:.7">${q.unit}</p>
+    </div>`;
+  }).join('');
+}
+
+// events
+$('btnStart').addEventListener('click', () => {
+  const units = selectedUnits();
+  const seq = document.querySelector('input[name="mode"]:checked')?.value !== 'rand';
+  startQuiz(BANK.filter(q => units.includes(q.unitKey)), false, seq);
+});
+$('btnNext').addEventListener('click', nextQuestion);
+$('btnQuit').addEventListener('click', () => {
+  if (confirm('确定退出本轮答题吗？进度不会保留，错题仍会保存。')) showScreen('home');
+});
+$('btnRetry').addEventListener('click', () => {
+  const units = selectedUnits();
+  const seq = document.querySelector('input[name="mode"]:checked')?.value !== 'rand';
+  startQuiz(BANK.filter(q => units.includes(q.unitKey)), false, seq);
+});
+$('btnHome').addEventListener('click', () => showScreen('home'));
+$('btnShowWrong').addEventListener('click', () => {
+  state.lastScreen = 'result';
+  // 优先展示本轮错题；若没有则展示全部
+  const ids = state.sessionWrong.length
+    ? state.sessionWrong.map(q => q.id)
+    : loadWrongIds();
+  renderWrongBook(ids);
+  showScreen('wrong');
+});
+$('btnWrongBookHome').addEventListener('click', () => {
+  state.lastScreen = 'home';
+  renderWrongBook();
+  showScreen('wrong');
+});
+$('btnBackFromWrong').addEventListener('click', () => showScreen(state.lastScreen === 'result' ? 'result' : 'home'));
+$('btnClearWrong').addEventListener('click', () => {
+  if (!loadWrongIds().length) return;
+  if (confirm('确定清空全部错题记录吗？')) {
+    saveWrongIds([]);
+    renderWrongBook();
+  }
+});
+$('btnPracticeWrong').addEventListener('click', () => {
+  const items = loadWrongIds().map(id => BANK.find(q => q.id === id)).filter(Boolean);
+  startQuiz(items, true, true);
+});
+
+// coverage stats on home
+(function(){
+  const lessons = new Set(BANK.map(q => q.tag).filter(Boolean));
+  const choice = BANK.filter(q => q.type==='choice').length;
+  const judge = BANK.filter(q => q.type==='judge').length;
+  const el = document.getElementById('bankCount');
+  if (el) el.textContent = `题库：${BANK.length} 题（选择 ${choice} · 判断 ${judge}）· 覆盖 ${lessons.size} 课`;
+})();
+</script>
+</body>
+</html>
